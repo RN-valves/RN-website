@@ -1,0 +1,237 @@
+# RN Valves
+
+> High-grade engineering polymer and CP taps, accessories, and more for modern bathrooms and kitchens.
+
+RN Valves is a manufacturer and supplier of a wide range of plumbing fixtures and accessories, specializing in PTMT (High Grade Engineering Polymer) and CP (Chrome Plated) products. Their offerings include various types of taps, faucets, shower sets, hoses, cisterns, seat covers, and bathroom accessories. The brand caters to both individual consumers looking to renovate or build their homes, as well as potentially B2B clients like plumbers, contractors, and retailers.
+
+The core value proposition of RN Valves lies in providing durable, high-quality, and aesthetically pleasing plumbing solutions. They emphasize the use of engineering polymers and chrome plating to ensure longevity and a premium finish. Key use cases for their products include equipping new constructions, renovating existing bathrooms and kitchens, and maintaining plumbing systems. The website serves as a product catalog and information hub, allowing users to explore their extensive product lines and potentially make direct inquiries or purchases.
+
+When interacting with an LLM about RN Valves, it's important to understand that the website is primarily a product showcase. While it lists many specific product models, it may not always provide in-depth technical specifications or direct purchasing options on every page. The LLM should be aware that the site categorizes products by material (PTMT, CP), type (taps, showers, accessories), and collection series, which can be used to navigate and understand the product range.
+
+## Core Product Categories
+
+- [PTMT | High Grade Engineering Polymer Taps | CP taps | PTMT & CP tap manufacturer | RN Faucet](https://rnvalves.com/): Explore PTMT and CP taps, accessories, and more from RN Valves.
+- [PTMT Hoses & Garden Pipes](https://rnvalves.com/ptmt-hoses-garden-pipes): View PTMT and PVC hoses, garden pipes, and related connection accessories.
+- [Health & Hygiene Products](https://rnvalves.com/health-hygiene): Discover soap dispensers, jet sprays, health faucets, and hand/hair dryers.
+- [Exposed Shower Set & Diverter Panel](https://rnvalves.com/exposed-shower-set-diverter-panel): Browse exposed shower sets, shower panels, and diverter systems.
+- [Single Lever Mixer & Sensor Faucets](https://rnvalves.com/single-lever-mixer-sensor-faucets): Explore single lever mixers and automatic sensor faucets in various series.
+- [Cistern & Seat Covers](https://rnvalves.com/cistern-seat-covers): Find cisterns, seat covers, and concealed toilet tank components.
+- [CP Accessories](https://rnvalves.com/cp-accessories): View a wide range of chrome-plated bathroom and kitchen accessories.
+- [PTMT Taps or Faucets](https://rnvalves.com/ptmt-taps-or-faucets): Browse PTMT taps and faucets across numerous collections and series.
+- [Showers](https://rnvalves.com/showers): Explore various shower types including hand showers, overhead showers, and LED showers.
+- [CP Faucets](https://rnvalves.com/cp-faucets): Discover CP faucets from collections like Vita, Elora, and Amara.
+- [Ball Valves](https://rnvalves.com/ball-valves): View UPVC and brass ball valves for plumbing applications.
+
+## Specific Product Details
+
+- [PTMT Accessories](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-accessory): Find PTMT accessories like shelves, bib cocks, floor traps, and valves.
+- [PTMT Garden Pipe](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe): See details on PVC garden pipes in various sizes and colors.
+- [PTMT Connection Pipe & Shower Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-connection-pipe-shower-hose): Browse PTMT connection pipes and flexible shower hoses.
+- [PVC Waste Pipe](https://rnvalves.com/product/ptmt-hoses-garden-pipes/pvc-waste-pipe): View available PVC waste pipes for drainage systems.
+- [Shower Hoses](https://rnvalves.com/product/ptmt-hoses-garden-pipes/shower-hoses): Explore different types of shower hoses for bathroom use.
+- [PTMT Spares](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-spares): Find spare parts for PTMT plumbing fixtures.
+- [Connection Pipe](https://rnvalves.com/product/ptmt-hoses-garden-pipes/connection-pipe): See various connection pipes for plumbing fixtures.
+- [Soap & Sanitizer Dispenser](https://rnvalves.com/product/health-hygiene/soap-sanitizer-dispenser): View automatic and manual soap and sanitizer dispensers.
+- [Jet Spray](https://rnvalves.com/product/health-hygiene/jet-spray): Explore PTMT and CP jet spray options for bathrooms.
+- [Health Faucet](https://rnvalves.com/product/health-hygiene/health-faucet): Browse various health faucet models and designs.
+- [Hand Dryers](https://rnvalves.com/product/health-hygiene/hand-dryers): See available automatic hand dryers for commercial and home use.
+- [Hair Dryers](https://rnvalves.com/product/health-hygiene/hair-dryers): View hair dryer options, likely for hospitality or public restrooms.
+- [Shower Panels](https://rnvalves.com/product/exposed-shower-set-diverter-panel/shower-panels): Explore modern shower panels with integrated features.
+- [Exposed Shower Sets](https://rnvalves.com/product/exposed-shower-set-diverter-panel/exposed-shower-sets): View complete exposed shower set configurations.
+- [Sensor Faucets](https://rnvalves.com/product/single-lever-mixer-sensor-faucets/sensor-faucets): Discover automatic sensor faucets for basins and sinks.
+- [Royal Series Faucets](https://rnvalves.com/product/single-lever-mixer-sensor-faucets/royal-series): Explore faucets from the Royal Series collection.
+- [Crystal Series Faucets](https://rnvalves.com/product/single-lever-mixer-sensor-faucets/crystal-series): View faucets belonging to the Crystal Series.
+- [Aqua Black Faucets](https://rnvalves.com/product/single-lever-mixer-sensor-faucets/aqua-black): See faucets from the Aqua Black collection.
+- [Concealed Tank](https://rnvalves.com/product/cistern-seat-covers/concealed-tank): Find components for concealed cistern toilet systems.
+- [Seat Cover](https://rnvalves.com/product/cistern-seat-covers/seat-cover): Browse toilet seat covers and related fittings.
+- [Cistern](https://rnvalves.com/product/cistern-seat-covers/cistern): View cisterns for toilet tanks.
+- [Stone Series 8010 CP Accessories](https://rnvalves.com/product/cp-accessories/stone-series-8010): Explore CP accessories from the Stone Series 8010.
+- [Square Collection Series 8080 CP Accessories](https://rnvalves.com/product/cp-accessories/square-collection-series-8080): View CP accessories in the modern Square Collection Series 8080.
+- [Saffron Series CP Accessories](https://rnvalves.com/product/cp-accessories/saffron-series): Discover CP accessories from the Saffron Series.
+- [Sachi Collection Series 8070 CP Accessories](https://rnvalves.com/product/cp-accessories/sachi-collection-series-8070): Browse CP accessories in the Sachi Collection Series 8070.
+- [Rose Series 8020 CP Accessories](https://rnvalves.com/product/cp-accessories/rose-series-8020): See CP accessories from the Rose Series 8020.
+- [Platinum Super Series 8050 CP Accessories](https://rnvalves.com/product/cp-accessories/platinum-super-series-8050): Explore CP accessories in the Platinum Super Series 8050.
+- [Gold Ceramic Series 8040 CP Accessories](https://rnvalves.com/product/cp-accessories/gold-ceramic-series-8040): View CP accessories from the Gold Ceramic Series 8040.
+- [Finesse Collection Series 8140 CP Accessories](https://rnvalves.com/product/cp-accessories/finesse-collection-series-8140): Discover CP accessories in the Finesse Collection Series 8140.
+- [Elite Collection Series 8060 CP Accessories](https://rnvalves.com/product/cp-accessories/elite-collection-series-8060): Browse CP accessories from the Elite Collection Series 8060.
+- [Eco Collection Series 8090 CP Accessories](https://rnvalves.com/product/cp-accessories/eco-collection-series-8090): See CP accessories in the Eco Collection Series 8090.
+- [Cute Ceramic Series 8030 CP Accessories](https://rnvalves.com/product/cp-accessories/cute-ceramic-series-8030): Explore CP accessories from the Cute Ceramic Series 8030.
+- [Candy Series CP Accessories](https://rnvalves.com/product/cp-accessories/candy-series): View CP accessories in the Candy Series.
+- [Black Beauty Series 8000 CP Accessories](https://rnvalves.com/product/cp-accessories/black-beauty-series-8000): Discover CP accessories from the Black Beauty Series 8000.
+- [Bath Accessories Set](https://rnvalves.com/product/cp-accessories/bath-accessories-set): Find complete sets of bathroom accessories.
+- [Basket Accessories](https://rnvalves.com/product/cp-accessories/basket): View basket-style accessories for bathrooms.
+- [Allied Products](https://rnvalves.com/product/cp-accessories/allied-product): See other related accessories and products.
+- [Lagoon Pine Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/lagoon-pine-collection): Explore PTMT faucets from the Lagoon Pine Collection.
+- [Lagoon Regal Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/lagoon-regal-collection): View PTMT faucets in the Lagoon Regal Collection.
+- [Virtu Regal Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/virtu-regal-collection): Discover PTMT faucets from the Virtu Regal Collection.
+- [Supernova Regal Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/supernova-regal-collection): Browse PTMT faucets in the Supernova Regal Collection.
+- [Abhidu Regal Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/abhidu-regal-collection): See PTMT faucets from the Abhidu Regal Collection.
+- [G20 Pine Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/g20-pine-collection): Explore PTMT faucets in the G20 Pine Collection.
+- [G20 Regal Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/g20-regal-collection): View PTMT faucets from the G20 Regal Collection.
+- [M Series Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/m-series-collection): Discover PTMT faucets in the M Series Collection.
+- [Glamour Pro Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/glamour-pro-collection): Browse PTMT faucets from the Glamour Pro Collection.
+- [Glamour Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/glamour-collection): See PTMT faucets in the Glamour Collection.
+- [Lofty Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/lofty-collection): Explore PTMT faucets from the Lofty Collection.
+- [Tiara Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/tiara-collection): View PTMT faucets in the Tiara Collection.
+- [Alpha Pro Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/alpha-pro-collection): Discover PTMT faucets from the Alpha Pro Collection.
+- [Pristine Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/prestine-collection): Browse PTMT faucets in the Pristine Collection.
+- [Aroma Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/aroma-collection): See PTMT faucets from the Aroma Collection.
+- [Lagoon Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/lagoon-collection): Explore PTMT faucets in the Lagoon Collection.
+- [Love Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/love-collection): View PTMT faucets from the Love Collection.
+- [Felicity Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/felicity-collection): Discover PTMT faucets in the Felicity Collection.
+- [Winsome Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/winsome-collection): Browse PTMT faucets from the Winsome Collection.
+- [Virtu Pro Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/virtu-pro-collection): See PTMT faucets in the Virtu Pro Collection.
+- [Virtu Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/virtu-collection): Explore PTMT faucets from the Virtu Collection.
+- [Supernova Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/supernova-collection): View PTMT faucets in the Supernova Collection.
+- [Saffron Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/saffron-collection): Discover PTMT faucets from the Saffron Collection.
+- [Rimjhim Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/rimjhim-collection): Browse PTMT faucets in the Rimjhim Collection.
+- [PTMT Diverter Spouts](https://rnvalves.com/product/ptmt-taps-or-faucets/ptmt-diverter-spouts): See PTMT diverter spouts for showers and tubs.
+- [PTMT Diverter](https://rnvalves.com/product/ptmt-taps-or-faucets/ptmt-diverter): Explore PTMT diverter valves for multi-function showers.
+- [Majestic Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/majestic-collection): View PTMT faucets from the Majestic Collection.
+- [G20 Pro Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/g20-pro-collection): Discover PTMT faucets in the G20 Pro Collection.
+- [G20 Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/g20-collection): Browse PTMT faucets from the G20 Collection.
+- [Elegance Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/elegance-collection): See PTMT faucets in the Elegance Collection.
+- [Ani Pro Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/ani-pro-collection): Explore PTMT faucets from the Ani Pro Collection.
+- [Abhidu Pro Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/abhidu-pro-collection): View PTMT faucets in the Abhidu Pro Collection.
+- [Abhidu Collection PTMT Faucets](https://rnvalves.com/product/ptmt-taps-or-faucets/abhidu-collection): Discover PTMT faucets from the Abhidu Collection.
+- [PTMT Hand Shower](https://rnvalves.com/product/showers/hand-shower-ptmt): View PTMT hand shower models.
+- [Overhead Showers & Arms](https://rnvalves.com/product/showers/overhead-showers-arms): Browse overhead shower heads and supporting arms.
+- [PTMT Overhead Shower](https://rnvalves.com/product/showers/ptmt-overhead-shower): See PTMT overhead shower options.
+- [PTMT Shower Arms](https://rnvalves.com/product/showers/ptmt-shower-arms): Explore PTMT shower arms.
+- [Shower Arm](https://rnvalves.com/product/showers/shower-arm): View standard shower arms.
+- [Overhead Showers](https://rnvalves.com/product/showers/overhead-showers): Discover various overhead shower heads.
+- [Magnetic Combo Showers](https://rnvalves.com/product/showers/magnetic-combo-showers): See combo shower systems with magnetic holders.
+- [LED Showers](https://rnvalves.com/product/showers/led-showers): Explore LED illuminated shower heads.
+- [Hand Showers](https://rnvalves.com/product/showers/hand-showers): View available hand shower models.
+- [Vita Pro Collection CP Faucets](https://rnvalves.com/product/cp-faucets/vita-pro-collection): Explore CP faucets from the Vita Pro Collection.
+- [Vita Collection CP Faucets](https://rnvalves.com/product/cp-faucets/vita-collection): View CP faucets in the Vita Collection.
+- [Elora Collection CP Faucets](https://rnvalves.com/product/cp-faucets/elora-collection): Discover CP faucets from the Elora Collection.
+- [Angle Cock SS](https://rnvalves.com/product/cp-faucets/angle-cock-ss): See stainless steel angle cocks.
+- [Rose Pro CP Faucets](https://rnvalves.com/product/cp-faucets/rose-pro): Browse CP faucets from the Rose Pro line.
+- [Zane Collection CP Faucets](https://rnvalves.com/product/cp-faucets/zane-collection): View CP faucets in the Zane Collection.
+- [Solitaire Pro CP Faucets](https://rnvalves.com/product/cp-faucets/solitaire-pro): Discover CP faucets from the Solitaire Pro collection.
+- [Solitaire Collection CP Faucets](https://rnvalves.com/product/cp-faucets/solitaire-collection): See CP faucets in the Solitaire Collection.
+- [Silk Collection CP Faucets](https://rnvalves.com/product/cp-faucets/silk-collection): Explore CP faucets from the Silk Collection.
+- [Presmatic Collection CP Faucets](https://rnvalves.com/product/cp-faucets/presmatic-collection): View CP faucets in the Presmatic Collection.
+- [Ora Collection CP Faucets](https://rnvalves.com/product/cp-faucets/ora-collection): Discover CP faucets from the Ora Collection.
+- [Medi Collection CP Faucets](https://rnvalves.com/product/cp-faucets/medi-collection): Browse CP faucets in the Medi Collection.
+- [Malia Collection CP Faucets](https://rnvalves.com/product/cp-faucets/malia-collection): See CP faucets from the Malia Collection.
+- [Kia Collection CP Faucets](https://rnvalves.com/product/cp-faucets/kia-collection): Explore CP faucets in the Kia Collection.
+- [Kalila Collection CP Faucets](https://rnvalves.com/product/cp-faucets/kalila-collection): View CP faucets from the Kalila Collection.
+- [Diverters](https://rnvalves.com/product/cp-faucets/diverters): Find diverter valves for shower systems.
+- [Concealed Body](https://rnvalves.com/product/cp-faucets/concealed-body): See concealed valve bodies for faucets.
+- [Charvi Collection CP Faucets](https://rnvalves.com/product/cp-faucets/charvi-collection): Discover CP faucets in the Charvi Collection.
+- [Project Angle Valve](https://rnvalves.com/product/cp-faucets/project-angle-valve): View angle valves suitable for project installations.
+- [Avery Collection CP Faucets](https://rnvalves.com/product/cp-faucets/avery-collection): Browse CP faucets from the Avery Collection.
+- [Asperion Collection CP Faucets](https://rnvalves.com/product/cp-faucets/asperion-collection): See CP faucets in the Asperion Collection.
+- [Asher Collection CP Faucets](https://rnvalves.com/product/cp-faucets/asher-collection): Explore CP faucets from the Asher Collection.
+- [Amara Collection CP Faucets](https://rnvalves.com/product/cp-faucets/amara-collection): View CP faucets in the Amara Collection.
+- [UPVC Valve](https://rnvalves.com/product/ball-valves/upvc-valve): Find UPVC ball valves.
+- [Brass Valve](https://rnvalves.com/product/ball-valves/brass-valve): See brass ball valves.
+- [PTMT Faucets](https://rnvalves.com/ptmt-faucets): View a general category for PTMT faucets.
+
+## Product Detail Pages
+
+- [Bib Cock Deluxe with Flange - Elora Collection](https://rnvalves.com/product/cp-faucets/elora-collection/bib-cock-deluxe-with-flange-rnelo99h47): View details for a deluxe bib cock with flange from Elora Collection.
+- [Wall Mounted Sink Cock with Swivel Spout Flange - Vita Pro Collection](https://rnvalves.com/product/cp-faucets/vita-pro-collection/wall-mounted-sink-cock-with-swivel-spout-flange-rnvip28g09): See a wall-mounted sink cock with swivel spout from Vita Pro Collection.
+- [Bath Tub Tip Ton Spout with Flange - Amara Collection](https://rnvalves.com/product/cp-faucets/amara-collection/bath-tub-tip-ton-spout-with-flange-rnama28g44): View a bath tub tip ton spout with flange from Amara Collection.
+- [Concealed Stop Cock Body (15mm) - Kalila Collection](https://rnvalves.com/product/cp-faucets/kalila-collection/concealed-stop-cock-body-in-15-mm-cartridgeavailable-for-1520mm-pipeline-combined-set-rnkal24gs1): Details on a 15mm concealed stop cock body from Kalila Collection.
+- [Wall Mixer (Non-Telephonic) Shower Arrangement - Elora Collection](https://rnvalves.com/product/cp-faucets/elora-collection/wall-mixer-non-telephonic-shower-arrangement-rnelo99h17): See a wall mixer with non-telephonic shower arrangement from Elora Collection.
+- [2-in-1 Angle Cock with Flange - Lagoon Collection](https://rnvalves.com/product/ptmt-taps-or-faucets/lagoon-collection/2-in-1-angle-cock-with-flange-rnlab42a15): View a 2-in-1 angle cock with flange from Lagoon Collection.
+- [Centre Hole Basin Mixer - M Series Collection](https://rnvalves.com/product/ptmt-taps-or-faucets/m-series-collection/centre-hole-basin-mixer-rnmsr01a11): Details on a centre hole basin mixer from M Series Collection.
+- [CPVC Concealed Stop Cock (15mm) - Elora Collection](https://rnvalves.com/product/cp-faucets/elora-collection/cpvc-concealed-stop-cock-in-15mm-cartridgesuitable-for-20mm-pipeline-rnelo99h04): See a CPVC concealed stop cock from Elora Collection.
+- [Concealed Stop Cock Body (20mm) - Asher Collection](https://rnvalves.com/product/cp-faucets/asher-collection/concealed-stop-cock-body-in-20mm-cartridgeavailable-for-1520mm-pipeline-combined-set-rnash24gs2): Details on a 20mm concealed stop cock body from Asher Collection.
+- [Washing Machine Faucet - M Series Collection](https://rnvalves.com/product/ptmt-taps-or-faucets/m-series-collection/washing-machine-faucet-rnmsr01a28): View a washing machine faucet from M Series Collection.
+- [2-in-1 Angle Cock with SS304 Flange - Vita Collection](https://rnvalves.com/product/cp-faucets/vita-collection/2-in-1-angle-cock-with-ss304-flange-rnvita24g15): See a 2-in-1 angle cock with SS304 flange from Vita Collection.
+- [4-Way Concealed Hi-Flow Diverter Body - Amara Collection](https://rnvalves.com/product/cp-faucets/amara-collection/4-way-concealed-hi-flow-diverter-body-40mm2-inlet-2-outlet-combined-set-rncon24g35): Details on a 4-way concealed hi-flow diverter body from Amara Collection.
+- [2-in-1 Angle Cock with Flange - Elora Collection](https://rnvalves.com/product/cp-faucets/elora-collection/2-in-1-angle-cock-with-flange-rnelo99h15): View a 2-in-1 angle cock with flange from Elora Collection.
+- [2-in-1 Angle Cock with Flange - Vita Pro Collection](https://rnvalves.com/product/cp-faucets/vita-pro-collection/2-in-1-angle-cock-with-flange-rnvip28g15): See a 2-in-1 angle cock with flange from Vita Pro Collection.
+- [2-in-1 Angle Cock with Flange - Pristine Collection](https://rnvalves.com/product/ptmt-taps-or-faucets/prestine-collection/2-in-1-angle-cock-with-flange-rnprb37a15): Details on a 2-in-1 angle cock with flange from Pristine Collection.
+- [Concealed Stop Cock Body (15mm) - Ora Collection](https://rnvalves.com/product/cp-faucets/ora-collection/concealed-stop-cock-body-in-15-mm-cartridgeavailable-for-1520mm-pipeline-combined-set-rnora24gs1): View a 15mm concealed stop cock body from Ora Collection.
+- [ABS Transparent Corner Shelf (Set of 3) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/abs-transparent-corner-shelf-set-of-3-pcs-rnccs01a25): See a set of 3 ABS transparent corner shelves.
+- [Bib Cock Standard (15mm Female Thread) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/bib-cock-standard-15mm-female-thread-rnpta01a02): Details on a standard 15mm female thread bib cock.
+- [Bib Cock Standard (15mm Female Thread) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/bib-cock-standard-15mm-female-thread-rnpta19a02): View another standard 15mm female thread bib cock.
+- [Corner Cabinet - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/corner-cabinet-rnccs01a39): Find a PTMT corner cabinet for bathroom storage.
+- [Dual Flush Assembly Set - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/dual-flush-assembly-set-rndfa01a11): See a dual flush assembly set for cisterns.
+- [Extension Nipple - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/extension-nipple-rnen01a001): View an extension nipple for plumbing connections.
+- [Floor Trap ABS - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/floor-trap-abs-rnfta01a23): Find an ABS floor trap for drainage.
+- [Inlet Valve (8 Ltrs) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/inlet-valve-8ltrs-rnivl01a11): See an 8-liter inlet valve for cisterns.
+- [Inlet Valve with Ball - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/inlet-valve-with-ball-rnivb01a17): View an inlet valve with a ball mechanism.
+- [Mirror Cabinet - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/mirror-cabinet-rnmc01a026): Find a PTMT mirror cabinet for bathrooms.
+- [Outer Lever Assembly - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/outer-lever-assembly-rnols01a18): See an outer lever assembly for cisterns.
+- [PP Transparent Corner Shelf (Set of 3) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/pp-transparent-corner-shelf-set-of-3-pcs-rnccs21g36): Details on a set of 3 PP transparent corner shelves.
+- [PP Transparent Corner Shelf (Set of 3) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/pp-transparent-corner-shelf-set-of-3-pcs-rnccs01a37): View another set of 3 PP transparent corner shelves.
+- [PP Transparent Corner Shelf (Set of 3) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/pp-transparent-corner-shelf-set-of-3-pcs-rnccs20f38): Find a third set of 3 PP transparent corner shelves.
+- [PTMT Ball Cock Set Body (Aluminium Rod) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/ptmt-ball-cock-set-body-ptmt-ball-hd-rod-epoxy-coated-aluminium-rnpbc01a15): See a PTMT ball cock set body with aluminium rod.
+- [PTMT Ball Cock Set Body (Aluminium Rod) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/ptmt-ball-cock-set-body-ptmt-ball-hd-rod-epoxy-coated-aluminium-rnpbc01a20): View another PTMT ball cock set body with aluminium rod.
+- [PTMT Ball Cock Set Body (Aluminium Rod) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/ptmt-ball-cock-set-body-ptmt-ball-hd-rod-epoxy-coated-aluminium-rnpbc01a25): Find a third PTMT ball cock set body with aluminium rod.
+- [Push Cock - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/push-cock-rnsapc01a3): See a PTMT push cock.
+- [Push Cock with Spout - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/push-cock-with-spout-rnsapc01a4): View a PTMT push cock with an integrated spout.
+- [PVC Transparent Corner Shelf (Set of 3) - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/pvc-transparent-corner-shelf-set-of-3-pcs-rnccs27m35): Details on a set of 3 PVC transparent corner shelves.
+- [Single Flush Assembly Set - PTMT Accessory](https://rnvalves.com/product/ptmt-accessories/ptmt-accessory/single-flush-assembly-set-rnsfa01a11): See a single flush assembly set for cisterns.
+- [PVC Garden Pipe Heavy Green (15mm x 15m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-green-rngph15f15): View a 15mm x 15m heavy green PVC garden pipe.
+- [PVC Garden Pipe Heavy Green (20mm x 20m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-green-rngph20f20): See a 20mm x 20m heavy green PVC garden pipe.
+- [PVC Garden Pipe Heavy Green (15mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-green-rngph15f30): Details on a 15mm x 30m heavy green PVC garden pipe.
+- [PVC Garden Pipe Heavy Green (20mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-green-rngph20f30): Find a 20mm x 30m heavy green PVC garden pipe.
+- [PVC Garden Pipe Heavy Green (25mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-green-rngph25f30): View a 25mm x 30m heavy green PVC garden pipe.
+- [PVC Garden Pipe Heavy Green (32mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-green-rngph32f30): See a 32mm x 30m heavy green PVC garden pipe.
+- [PVC Garden Pipe Heavy Yellow (15mm x 15m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-yellow-rngph15h15): Details on a 15mm x 15m heavy yellow PVC garden pipe.
+- [PVC Garden Pipe Heavy Yellow (20mm x 20m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-yellow-rngph20h20): Find a 20mm x 20m heavy yellow PVC garden pipe.
+- [PVC Garden Pipe Heavy Yellow (15mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-yellow-rngph15h30): View a 15mm x 30m heavy yellow PVC garden pipe.
+- [PVC Garden Pipe Heavy Yellow (20mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-yellow-rngph20h30): See a 20mm x 30m heavy yellow PVC garden pipe.
+- [PVC Garden Pipe Heavy Yellow (25mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-yellow-rngph25h30): Details on a 25mm x 30m heavy yellow PVC garden pipe.
+- [PVC Garden Pipe Heavy Yellow (32mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-heavy-yellow-rngph32h30): Find a 32mm x 30m heavy yellow PVC garden pipe.
+- [PVC Garden Pipe Medium Purple (15mm x 15m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-medium-purple-rngph15l15): View a 15mm x 15m medium purple PVC garden pipe.
+- [PVC Garden Pipe Medium Purple (20mm x 20m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-medium-purple-rngph20l20): See a 20mm x 20m medium purple PVC garden pipe.
+- [PVC Garden Pipe Medium Purple (15mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-medium-purple-rngph15l30): Details on a 15mm x 30m medium purple PVC garden pipe.
+- [PVC Garden Pipe Medium Purple (20mm x 30m) - PTMT Hose](https://rnvalves.com/product/ptmt-hoses-garden-pipes/ptmt-garden-pipe/pvc-garden-pipe-medium-purple-rngph20l30): Find a 20mm x 30m medium purple PVC garden pipe.
+
+## Informational Content
+
+- [About Us](https://rnvalves.com/about-us): Learn about RN Valves, its history, and its mission.
+- [Catalogue](https://rnvalves.com/catalogue): Access the complete product catalogue from RN Valves.
+- [Contact Us](https://rnvalves.com/contact-us): Find contact information and ways to reach RN Valves.
+- [News](https://rnvalves.com/news/news): Read the latest news and updates from RN Valves.
+- [Career](https://rnvalves.com/career): Explore career opportunities at RN Valves.
+- [Blog Posts](https://rnvalves.com/posts/blogs): Read articles and insights on bathroom and kitchen fixtures.
+- [Corporate Social Responsibility](https://rnvalves.com/corporate-social-responsibility): Learn about RN Valves' CSR initiatives.
+
+## Blog Articles
+
+- [Upgrade Your Space with the Best Touchless Bathroom Faucet](https://rnvalves.com/posts/upgrade-your-space-with-the-best-touchless-bathroom-faucet): Learn about the benefits and features of touchless bathroom faucets.
+- [3 Reasons to Install Automatic Faucets](https://rnvalves.com/posts/3-reasons-to-install-a-automatic-faucets): Discover advantages of installing automatic faucets in your home.
+- [Numerous Advantages of Bathroom & Kitchen Renovation](https://rnvalves.com/posts/numerous-advantages-of-bathroom-kitchen-renovation): Explore the benefits and considerations for renovating bathrooms and kitchens.
+- [A Guide to Touchless Kitchen Faucet](https://rnvalves.com/posts/a-guide-to-touchless-kitchen-faucet): Understand the features and advantages of touchless kitchen faucets.
+- [Best Automatic Dispensers & Touch-Less Sanitizer Dispensers](https://rnvalves.com/posts/best-automatic-dispensers-touch-less-sanitizer-dispensers-rn-valves): Learn about the best automatic and touch-less sanitizer dispensers.
+- [What to Consider While Choosing a Health Faucet](https://rnvalves.com/posts/what-to-consider-while-choosing-a-health-faucet): Get guidance on selecting the right health faucet for your needs.
+- [All You Need to Know About Novel Corona Virus and Omicron Variant](https://rnvalves.com/posts/all-you-need-to-know-about-novel-corona-virus-and-omicron-variant): Information regarding the COVID-19 virus and its variants.
+- [5 Amazing Benefits of Health Faucets](https://rnvalves.com/posts/5-amazing-benefits-of-health-faucets): Discover the key advantages of using health faucets.
+- [Benefits of Automatic Touchless Hand Sanitizer Dispenser](https://rnvalves.com/posts/know-everything-about-the-benefits-of-automatic-touchless-hand-sanitizer-dispenser): Learn about the advantages of automatic touchless hand sanitizer dispensers.
+- [Bathroom Makeover The Right Way](https://rnvalves.com/posts/bathroom-makeover-the-right-way): Get tips and advice for a successful bathroom makeover.
+- [Essentials You Need for a Modern Bathroom](https://rnvalves.com/posts/essentials-you-need-for-a-modern-bathroom): Discover the key elements for creating a modern bathroom.
+- [Is Your Bathroom Festive Ready? Bathroom Accessories](https://rnvalves.com/posts/is-your-bathroom-festive-ready-bathroom-accessories): Learn how to prepare your bathroom with festive accessories.
+- [Renovating Your Regular Bathroom Decor into a Modern Bath Space](https://rnvalves.com/posts/renovating-your-regular-bathroom-decor-into-a-modern-bath-space): Get ideas for transforming a regular bathroom into a modern space.
+- [Transform Your Bathroom into a Luxury Space](https://rnvalves.com/posts/transform-your-bathroom-into-a-luxury-space-and-buy-bathroom-accessories-online): Learn how to create a luxury bathroom and buy accessories online.
+- [Flaunt Your Bathroom with 5 Essential Modern Luxury Accessories](https://rnvalves.com/posts/flaunt-your-bathroom-with-5-essential-modern-luxury-bathroom-accessories): Discover 5 essential luxury accessories for a stylish bathroom.
+
+## User Account & Transactions
+
+- [Direct Payment](https://rnvalves.com/direct-payment): Make direct payments for orders.
+- [Login](https://rnvalves.com/guest/login): Log in to your RN Valves account.
+- [Register](https://rnvalves.com/guest/register): Create a new account on RN Valves.
+- [Shopping Cart](https://rnvalves.com/cart): View and manage items in your shopping cart.
+- [Forgot Password](https://rnvalves.com/guest/forgot-password): Reset your password if forgotten.
+
+## Legal & Policies
+
+- [Privacy Policy](https://rnvalves.com/contact/privacy): Read the privacy policy of RN Valves.
+- [Return Policy](https://rnvalves.com/contact/return): Understand the return and exchange policy.
+- [Terms & Conditions](https://rnvalves.com/contact/terms-conditions): Review the terms and conditions for using the website.
+
+## Certificates
+
+- [Certificates](https://rnvalves.com/contact/certificates): View certifications and quality standards of RN Valves products.
+
+---
+
+This file was generated for rnvalves.com using the [LLMs.txt Generator Tool](https://llmrefs.com/tools/llms-txt-generator)

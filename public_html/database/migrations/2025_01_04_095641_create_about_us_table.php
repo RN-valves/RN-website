@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('about_us', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('vision'); 
+            $table->text('mission'); 
+            $table->text('values'); 
+            $table->longText('milestone'); 
+            $table->string('youtube_link')->nullable(); 
+            $table->longText('desc1')->nullable(); 
+            $table->longText('desc2')->nullable(); 
+            $table->longText('desc3')->nullable(); 
+            $table->string('catalogue'); 
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('about_us');
+    }
+};

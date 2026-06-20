@@ -1,0 +1,1 @@
+<img src="{{ url(frontPage()->logo??'') }}" class="web_logo" alt="RN Valves & Faucets - Logo">
