@@ -300,7 +300,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 
 
-<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
 <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 <script src="https://www.carmela24.com/asreffect.js"></script>
 <script>jQuery('#carmela247').asreffect({color: '#0F0F0F',canvasHeight: 15});</script>

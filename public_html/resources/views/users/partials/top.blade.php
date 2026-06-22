@@ -68,7 +68,7 @@ $url = url()->current();
             <nav class="navbar navbar-area navbar-expand-lg style-02">
                <div class="container-fluid nav-container dsktop_right_pad">
                   <button class="navbar-toggler" type="button" data-toggle="collapse"
-                     data-target="#navbarSupportedContent" aria-expanded="false"
+                     data-target="#autoshop_main_menu" aria-expanded="false"
                      aria-label="Toggle navigation">
                   <span class="humberger-menu black">
                   <span class="one"></span>
