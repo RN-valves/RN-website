@@ -33,6 +33,22 @@
       @vite(['resources/css/app.css', 'resources/js/app.js'])
       <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_RECAPTCHA_KEY') }}"></script>
 
+      {{-- Desktop Navbar Visibility Fix --}}
+      <style>
+         @media (min-width: 992px) {
+             .navbar-expand-lg .navbar-collapse {
+                 display: flex !important;
+                 flex-basis: auto;
+             }
+             .navbar-expand-lg .navbar-nav {
+                 flex-direction: row;
+             }
+             .navbar-area .nav-container .navbar-collapse .navbar-nav {
+                 display: flex;
+             }
+         }
+      </style>
+
       {{-- ajax form submit alert popup  --}}
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css">
       {{-- ajax form submit alert popup  --}}
