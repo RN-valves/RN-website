@@ -30,6 +30,7 @@
       <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
       <link rel="stylesheet" type="text/css"  href="{{url('users/assets/css/style.css?100')}}">
       <link rel="stylesheet" type="text/css" href="{{ url('admin/assets/css/toastr.min.css') }}">
+      @vite(['resources/css/app.css', 'resources/js/app.js'])
       <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_RECAPTCHA_KEY') }}"></script>
 
       {{-- ajax form submit alert popup  --}}
