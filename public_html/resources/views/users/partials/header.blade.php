@@ -27,7 +27,7 @@
       <link rel="stylesheet" href="{{url('users/asr_zoom/jqzoom.css')}}" type="text/css">
       <link rel="stylesheet" type="text/css" href="{{url('users/rnsldr/default.css')}}">
       <link rel="stylesheet" type="text/css" href="{{url('users/rnsldr/asr-slider.css')}}">
-      <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="{{ url('admin/assets/vendor/bootstrap/css/bootstrap.min.css') }}">
       <link rel="stylesheet" type="text/css"  href="{{url('users/assets/css/style.css?100')}}">
       <link rel="stylesheet" type="text/css" href="{{ url('admin/assets/css/toastr.min.css') }}">
       @vite(['resources/css/app.css', 'resources/js/app.js'])
