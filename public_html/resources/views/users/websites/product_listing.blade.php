@@ -123,8 +123,11 @@ $url = url()->full();
 <div class="cstm_page_section">
    <div class="container-fluid">
       <div class="row">
-         
-         <div class="col-lg-9 order-1 order-lg-2">
+         {{-- Desktop sidebar Filter  --}}
+         @include('users.websites.listings.desktop_filter')
+         {{-- Desktop sidebar Filter  --}}
+
+         <div class="col-lg-9">
             <!-- Shop Page Grig View-->
             <div class="shop-page-grid-view">
                <div class="product-filtering-area">
@@ -156,9 +159,6 @@ $url = url()->full();
             </div>
             <!--// Shop Page Grid View-->
          </div>
-         {{-- Desktop sidebar Filter  --}}
-         @include('users.websites.listings.desktop_filter')
-         {{-- Desktop sidebar Filter  --}}
       </div>
    </div>
 </div>

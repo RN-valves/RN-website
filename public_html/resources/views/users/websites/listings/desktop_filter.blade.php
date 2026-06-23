@@ -1,4 +1,4 @@
-<div class="col-lg-3 order-2 order-lg-1">
+<div class="col-lg-3">
    <div class="widget-area">
       {{-- Check search result --}}
       <form id="filterForm" method="post" action="{{ route('filterProductList') }}">
