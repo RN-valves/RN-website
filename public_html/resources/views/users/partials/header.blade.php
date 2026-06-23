@@ -39,12 +39,21 @@
              .navbar-expand-lg .navbar-collapse {
                  display: flex !important;
                  flex-basis: auto;
+                 visibility: visible !important;
+                 opacity: 1 !important;
              }
              .navbar-expand-lg .navbar-nav {
                  flex-direction: row;
+                 display: flex !important;
              }
              .navbar-area .nav-container .navbar-collapse .navbar-nav {
-                 display: flex;
+                 display: flex !important;
+             }
+             .navbar-area .nav-container .navbar-collapse .navbar-nav > li {
+                 color: #181818 !important;
+             }
+             .navbar-area .nav-container .navbar-collapse .navbar-nav > li > a {
+                 color: #181818 !important;
              }
          }
       </style>
