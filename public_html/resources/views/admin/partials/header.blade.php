@@ -18,8 +18,8 @@
   @yield('seo_title')
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="{{ url('admin/assets/img/favicon.png') }}" rel="icon">
+  <link href="{{ url('admin/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -57,7 +57,7 @@
 <style type="text/css">
   .bx{font-size:font-size:25px!important;}
   li .select2-search-choice-close{background-color:red!important;}
-  .select2-search-choice-close{background-image:url({{ url('admin/assests/img/select2.png') }})!important;}
+  .select2-search-choice-close{background-image:url({{ url('admin/assets/img/select2.png') }})!important;}
   li .active{
     background-color:rgb(240, 240, 240);
     border-left:4px solid grey;

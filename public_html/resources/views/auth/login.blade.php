@@ -46,7 +46,7 @@
                      <x-text-input id="password" class="form-control"
                         type="password"
                         name="password"
-                        required autocomplete="current-password" placeholder="Enter Password"/>
+                        required autocomplete="off" placeholder="Enter Password"/>
                   </div>
                   <x-input-error :messages="$errors->get('password')" class="mt-2 text-danger" />
                   @if ($errors->has('g-recaptcha-response'))

@@ -376,5 +376,37 @@ $(document).on({
     }
 });     
 </script>  --}}
-    
+
+{{-- Global: Disable browser autofill on ALL input fields --}}
+<script>
+(function() {
+    function disableAutofill(root) {
+        var elements = (root || document).querySelectorAll('input, textarea, select, form');
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].setAttribute('autocomplete', 'off');
+        }
+    }
+    // Apply on page load
+    document.addEventListener('DOMContentLoaded', disableAutofill);
+    // Apply to dynamically added elements (modals, AJAX content)
+    if (typeof MutationObserver !== 'undefined') {
+        var observer = new MutationObserver(function(mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+                for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+                    var node = mutations[i].addedNodes[j];
+                    if (node.nodeType === 1) {
+                        if (node.matches && node.matches('input, textarea, select, form')) {
+                            node.setAttribute('autocomplete', 'off');
+                        }
+                        disableAutofill(node);
+                    }
+                }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    }
+})();
+</script>
 
