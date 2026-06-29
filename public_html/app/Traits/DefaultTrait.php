@@ -30,7 +30,11 @@ trait DefaultTrait
             $randomName = str()->random(30);
             $name = $attachment->getClientOriginalName();
             $fileName = str($name)->append($randomName)->slug().'.'.$attachment->getClientOriginalExtension();
-            $request->file($fieldname)->move(public_path($directory), $fileName);
+            $directoryPath = public_path($directory);
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0755, true);
+            }
+            $request->file($fieldname)->move($directoryPath, $fileName);
             $filePath = $directory.$fileName;
             //$filePath = $request->file($fieldname)->store($directory, 'public'); 
             return $filePath;
@@ -51,15 +55,20 @@ trait DefaultTrait
             $fileName = time().'-'.$thumbnail->getClientOriginalName();
             $fileName = str($fileName)->slug().'.'.$thumbnail->getClientOriginalExtension();
 
-            $thumbnail->move($directory,$fileName);
+            $directoryPath = public_path($directory);
+            if (!file_exists($directoryPath)) {
+                mkdir($directoryPath, 0755, true);
+            }
+
+            $thumbnail->move($directoryPath, $fileName);
 
             $imgManager = new ImageManager(new Driver());
 
-            $thumbImage = $imgManager->read(public_path($directory.$fileName));
+            $thumbImage = $imgManager->read($directoryPath . DIRECTORY_SEPARATOR . $fileName);
 
             $thumbImage->resize($size_height,$size_width);
 
-            $thumbImage->save(public_path($directory.$fileName));
+            $thumbImage->save($directoryPath . DIRECTORY_SEPARATOR . $fileName);
 
             //Image::make($thumbnail)->resize($size_height,$size_width)->save(public_path($directory.$fileName));
             $filePath = $directory.$fileName;
