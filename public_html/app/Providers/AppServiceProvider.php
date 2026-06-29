@@ -37,6 +37,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (app()->environment('production') || config('app.env') === 'production') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         //$this->registerPolicies();
         /*if (! $this->app->routesAreCached()) {
             Passport::routes();
