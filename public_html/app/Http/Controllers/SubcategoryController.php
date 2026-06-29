@@ -27,6 +27,22 @@ class SubcategoryController extends Controller
         }
     }
 
+    private function updateSubcategoryFile(Request $request, string $field, Subcategory $subcategory, string $directory, int $height, int $width): ?string
+    {
+        if (!$request->hasFile($field) || !$request->file($field)->isValid()) {
+            return Subcategory::whereId($subcategory->id)->value($field);
+        }
+
+        $this->deleteLocalFileIfExists(Subcategory::whereId($subcategory->id)->value($field));
+        $uploadedPath = $this->ImageResizer($request, $field, $directory, $height, $width);
+
+        if (!is_string($uploadedPath) || $uploadedPath === '') {
+            throw new \RuntimeException('Unable to upload '.$field.'. Please use JPG, PNG, or WEBP image.');
+        }
+
+        return $uploadedPath;
+    }
+
     function __construct()
     {
         $this->middleware(['permission:subcategory-list'], ['only' => ['index']]);
@@ -154,35 +170,15 @@ class SubcategoryController extends Controller
             'pdf_catalogue' => ['nullable'],
         ]);
         try{
-            $data = $request->only('name','title','keywords','description','image','is_visible_website','content_id','status','banner','icon','category_id');
-            if($request->hasFile('image')){
-                $oldFile = Subcategory::whereId($subcategory->id)->value('image');
-                $this->deleteLocalFileIfExists($oldFile);
-                $data['image'] = $this->ImageResizer($request, 'image', 'uploads/catalogue/subcategories/',500,500)??null;
-            }else{
-                $data['image'] = Subcategory::whereId($subcategory->id)->value('image');
-            }
-            
-            if($request->hasFile('icon')){
-                $iconFile = Subcategory::whereId($subcategory->id)->value('icon');
-                $this->deleteLocalFileIfExists($iconFile);
-                $data['icon'] = $this->ImageResizer($request, 'icon', 'uploads/catalogue/subcategories/icons/',100,100)??null;
-            }else{
-                $data['icon'] = Subcategory::whereId($subcategory->id)->value('icon');
-            }
-            
-            if($request->hasFile('banner')){
-                $bannerFile = Subcategory::whereId($subcategory->id)->value('banner');
-                $this->deleteLocalFileIfExists($bannerFile);
-                $data['banner'] = $this->ImageResizer($request, 'banner', 'uploads/catalogue/subcategories/banners/',1900,400)??null;
-            }else{
-                $data['banner'] = Subcategory::whereId($subcategory->id)->value('banner');
-            }
-            
-            if($request->hasFile('pdf_catalogue')){
+            $data = $request->only('name','title','keywords','description','is_visible_website','content_id','status','category_id');
+            $data['image'] = $this->updateSubcategoryFile($request, 'image', $subcategory, 'uploads/catalogue/subcategories/', 500, 500);
+            $data['icon'] = $this->updateSubcategoryFile($request, 'icon', $subcategory, 'uploads/catalogue/subcategories/icons/', 100, 100);
+            $data['banner'] = $this->updateSubcategoryFile($request, 'banner', $subcategory, 'uploads/catalogue/subcategories/banners/', 1900, 400);
+
+            if($request->hasFile('pdf_catalogue') && $request->file('pdf_catalogue')->isValid()){
                 $pdf_catalogueFile = Subcategory::whereId($subcategory->id)->value('pdf_catalogue');
                 $this->deleteLocalFileIfExists($pdf_catalogueFile);
-                $data['pdf_catalogue'] = $this->verifyAndUpload($request, 'pdf_catalogue', 'uploads/catalogue/')??null;
+                $data['pdf_catalogue'] = $this->verifyAndUpload($request, 'pdf_catalogue', 'uploads/catalogue/') ?? Subcategory::whereId($subcategory->id)->value('pdf_catalogue');
             }else{
                 $data['pdf_catalogue'] = $request->pdf_catalogue ?? Subcategory::whereId($subcategory->id)->value('pdf_catalogue');
             }
@@ -191,8 +187,8 @@ class SubcategoryController extends Controller
             Subcategory::whereId($subcategory->id)->update($data);
             $this->productsStatusUpdateSubCategory($subcategory->id);
             return redirect()->route('subcategories.show', ['subcategory' => $subcategory])->with('success', 'Data updated successfully');
-        }catch(\Exception $e){
-            return back()->with('error', $e->getMessage());
+        }catch(\Throwable $e){
+            return back()->with('error', $e->getMessage())->withInput();
         }
     }
 

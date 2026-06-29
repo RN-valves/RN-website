@@ -2,9 +2,10 @@ FROM php:8.2-fpm
 
 # Install system dependencies + Node.js 20
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip nginx ca-certificates gnupg \
+    git curl libpng-dev libwebp-dev libjpeg-dev libonig-dev libxml2-dev zip unzip nginx ca-certificates gnupg \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
+    && docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Install Composer

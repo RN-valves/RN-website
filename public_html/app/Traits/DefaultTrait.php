@@ -22,9 +22,7 @@ trait DefaultTrait
         if( $request->hasFile( $fieldname ) ) {
 
             if (!$request->file($fieldname)->isValid()) {
-                
-                return back()->with('error', 'Invalid Image!');
-
+                return null;
             }
             $attachment = $request->file($fieldname);
             $randomName = str()->random(30);
@@ -36,7 +34,6 @@ trait DefaultTrait
             }
             $request->file($fieldname)->move($directoryPath, $fileName);
             $filePath = $directory.$fileName;
-            //$filePath = $request->file($fieldname)->store($directory, 'public'); 
             return $filePath;
         }
 
@@ -48,12 +45,13 @@ trait DefaultTrait
         if( $request->hasFile( $fieldname ) ) {
 
             if (!$request->file($fieldname)->isValid()) {
-                return back()->with('error', 'Invalid Image!');
+                return null;
             }
             
             $thumbnail = $request->file($fieldname);
-            $fileName = time().'-'.$thumbnail->getClientOriginalName();
-            $fileName = str($fileName)->slug().'.'.$thumbnail->getClientOriginalExtension();
+            $originalName = pathinfo($thumbnail->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = strtolower($thumbnail->getClientOriginalExtension());
+            $fileName = time().'-'.str($originalName)->slug().'.'.$extension;
 
             $directoryPath = public_path($directory);
             if (!file_exists($directoryPath)) {
@@ -61,18 +59,18 @@ trait DefaultTrait
             }
 
             $thumbnail->move($directoryPath, $fileName);
+            $absoluteFilePath = $directoryPath . DIRECTORY_SEPARATOR . $fileName;
+
+            if (in_array($extension, ['svg', 'gif'], true)) {
+                return $directory.$fileName;
+            }
 
             $imgManager = new ImageManager(new Driver());
+            $thumbImage = $imgManager->read($absoluteFilePath);
+            $thumbImage->resize($size_height, $size_width);
+            $thumbImage->save($absoluteFilePath);
 
-            $thumbImage = $imgManager->read($directoryPath . DIRECTORY_SEPARATOR . $fileName);
-
-            $thumbImage->resize($size_height,$size_width);
-
-            $thumbImage->save($directoryPath . DIRECTORY_SEPARATOR . $fileName);
-
-            //Image::make($thumbnail)->resize($size_height,$size_width)->save(public_path($directory.$fileName));
-            $filePath = $directory.$fileName;
-            return $filePath;
+            return $directory.$fileName;
         }
         return null;
     }
@@ -173,9 +171,14 @@ trait DefaultTrait
 
     public function productsStatusUpdateSubCategory($subcategoryId){
         $subCategory = Subcategory::whereId($subcategoryId)->first();
-        if($subCategory->products->count()>0){
-            return Product::where(['subcategory_id'=>$subcategoryId])->update(['is_visible_website'=>$subCategory->is_visible_website, 'status'=>$subCategory->status]);
+        if(!$subCategory || $subCategory->products->count() === 0){
+            return;
         }
+
+        return Product::where(['subcategory_id'=>$subcategoryId])->update([
+            'is_visible_website' => $subCategory->is_visible_website,
+            'status' => $subCategory->status,
+        ]);
     }
 
     public function updateProductUrl($productId){
