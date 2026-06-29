@@ -15,6 +15,18 @@ use DB;
 class SubcategoryController extends Controller
 {
     use DefaultTrait;
+    private function deleteLocalFileIfExists(?string $path): void
+    {
+        if (empty($path) || str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return;
+        }
+
+        $absolutePath = public_path($path);
+        if (File::exists($absolutePath)) {
+            File::delete($absolutePath);
+        }
+    }
+
     function __construct()
     {
         $this->middleware(['permission:subcategory-list'], ['only' => ['index']]);
@@ -145,7 +157,7 @@ class SubcategoryController extends Controller
             $data = $request->only('name','title','keywords','description','image','is_visible_website','content_id','status','banner','icon','category_id');
             if($request->hasFile('image')){
                 $oldFile = Subcategory::whereId($subcategory->id)->value('image');
-                File::delete($oldFile);
+                $this->deleteLocalFileIfExists($oldFile);
                 $data['image'] = $this->ImageResizer($request, 'image', 'uploads/catalogue/subcategories/',500,500)??null;
             }else{
                 $data['image'] = Subcategory::whereId($subcategory->id)->value('image');
@@ -153,7 +165,7 @@ class SubcategoryController extends Controller
             
             if($request->hasFile('icon')){
                 $iconFile = Subcategory::whereId($subcategory->id)->value('icon');
-                File::delete($iconFile);
+                $this->deleteLocalFileIfExists($iconFile);
                 $data['icon'] = $this->ImageResizer($request, 'icon', 'uploads/catalogue/subcategories/icons/',100,100)??null;
             }else{
                 $data['icon'] = Subcategory::whereId($subcategory->id)->value('icon');
@@ -161,7 +173,7 @@ class SubcategoryController extends Controller
             
             if($request->hasFile('banner')){
                 $bannerFile = Subcategory::whereId($subcategory->id)->value('banner');
-                File::delete($bannerFile);
+                $this->deleteLocalFileIfExists($bannerFile);
                 $data['banner'] = $this->ImageResizer($request, 'banner', 'uploads/catalogue/subcategories/banners/',1900,400)??null;
             }else{
                 $data['banner'] = Subcategory::whereId($subcategory->id)->value('banner');
@@ -169,10 +181,10 @@ class SubcategoryController extends Controller
             
             if($request->hasFile('pdf_catalogue')){
                 $pdf_catalogueFile = Subcategory::whereId($subcategory->id)->value('pdf_catalogue');
-                File::delete($pdf_catalogueFile);
+                $this->deleteLocalFileIfExists($pdf_catalogueFile);
                 $data['pdf_catalogue'] = $this->verifyAndUpload($request, 'pdf_catalogue', 'uploads/catalogue/')??null;
             }else{
-                $data['pdf_catalogue'] = $request->pdf_catalogue;
+                $data['pdf_catalogue'] = $request->pdf_catalogue ?? Subcategory::whereId($subcategory->id)->value('pdf_catalogue');
             }
             
             $data['url_key'] = str($data['name'])->slug();
