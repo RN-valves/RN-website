@@ -248,7 +248,7 @@
 }
    </style>
    <a href="https://api.whatsapp.com/send?phone=91{{frontPage()->whatsapp??''}}&amp;text=Hello, I am a visitor from your website and would like to chat with you." target="_blank" class="call_fixed_btn"><i class="fab fa-whatsapp"></i></a>
-<a href="tel:{{frontPage()->mobile}}" class="phone-icon">
+<a href="tel:{{frontPage()->mobile??''}}" class="phone-icon">
     <img src="{{ asset('icons/phone-icon.png') }}" alt="RN Valves & Faucets" title="RN Valves & Faucets" alt="Phone Icon">
 </a>
 <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
