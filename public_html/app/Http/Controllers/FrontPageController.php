@@ -84,7 +84,7 @@ class FrontPageController extends Controller
             'title' => ['required','string','max:500'],
             'keywords' => ['required','string','max:500'],
             'description' => ['required','string','max:500'],
-            // 'logo' => ['required','mimes:png'],
+            'logo' => ['nullable','file','mimes:png,svg','max:2048'],
             'mobile' => ['required','string','max:15'],
             'whatsapp' => ['required','digits:10'],
             'email' => ['required','string','max:100','email'],
@@ -101,7 +101,12 @@ class FrontPageController extends Controller
         try{
             $data= $request->only('name','title','keywords','description','logo','mobile','whatsapp','email','address','fb_link','insta_link','twitter_link','linkedin_link','youtube_link','pinterest_link','goole_app_link','ios_app_link');
             if($request->hasFile('logo')){
-                $data['logo'] = $this->ImageResizer($request, 'logo', 'uploads/logo/',1000,1000)??null;
+                $logoExtension = strtolower($request->file('logo')->getClientOriginalExtension());
+                if ($logoExtension === 'svg') {
+                    $data['logo'] = $this->verifyAndUpload($request, 'logo', 'uploads/logo/') ?? null;
+                } else {
+                    $data['logo'] = $this->ImageResizer($request, 'logo', 'uploads/logo/',1000,1000) ?? null;
+                }
             }
             FrontPage::whereId(1)->update($data);
             return back()->with('success', 'data updated successfully');

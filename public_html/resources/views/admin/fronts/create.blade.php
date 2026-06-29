@@ -43,8 +43,8 @@
                <x-input-error class="mt-2 error_ipt text-danger" :messages="$errors->get('email')" />
             </div>
             <div class="col-lg-4 form-group pt-2">
-               <label class="mb-1">Logo only PNG Format (Size : 200*200 px)</label>
-               <input type="file" name="logo" class="form-control shadow-none" placeholder="Enter Value" autocomplete="off">
+               <label class="mb-1">Logo (PNG or SVG format)</label>
+               <input type="file" name="logo" accept=".png,.svg,image/png,image/svg+xml" class="form-control shadow-none" placeholder="Enter Value" autocomplete="off">
                <x-input-error class="mt-2 error_ipt text-danger" :messages="$errors->get('logo')" />
                <a target="_blank" href="{{ url($frontPage->logo??'') }}">Click to view Logo</a>
             </div>
