@@ -11,6 +11,7 @@ RUN composer install \
     --no-dev \
     --prefer-dist \
     --optimize-autoloader \
+    --no-scripts \
     --ignore-platform-reqs \
     --no-interaction \
     --no-progress
