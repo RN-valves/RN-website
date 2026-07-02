@@ -178,6 +178,10 @@ ul#thumblist li a.zoomThumbActive {
     width: 90px;
     position: absolute;
     left: 0px;
+    max-height: 420px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
 }
 
 .div_thumb a img.thmbs {
@@ -189,11 +193,47 @@ ul#thumblist li a.zoomThumbActive {
     margin-left: 90px;
     border: 1px solid #ddd;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .prothumbsize {
+    display: block;
+    margin: 0 auto;
+    width: 100% !important;
+    height: 100% !important;
     max-height: 498px !important;
     max-width: 100% !important;
+    object-fit: contain;
+    object-position: center;
+}
+
+.mainphoto_showcase .jqzoom,
+.mainphoto_showcase .zoomPad,
+.mainphoto_showcase .zoomWrapper,
+.mainphoto_showcase .zoomWrapperImage {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.mainphoto_showcase .zoomWrapperImage {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.mainphoto_showcase .zoomWrapperImage img {
+    position: static !important;
+    display: block;
+    margin: 0 auto;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 498px !important;
+    object-fit: contain;
+    object-position: center;
 }
 
 .outofstock {
@@ -686,6 +726,9 @@ ul#thumblist li a.zoomThumbActive {
         position: relative;
         left: 0px;
         margin-top: 10px;
+        max-height: none;
+        overflow-y: visible;
+        overflow-x: visible;
     }
 
     ul#thumblist li {
@@ -710,6 +753,14 @@ ul#thumblist li a.zoomThumbActive {
     }
 
     .prothumbsize {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 350px !important;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .mainphoto_showcase .zoomWrapperImage img {
         max-height: 350px !important;
     }
 
