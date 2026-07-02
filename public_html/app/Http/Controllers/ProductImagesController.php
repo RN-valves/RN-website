@@ -13,6 +13,7 @@ use App\Imports\ProductImagesImport;
 use Excel;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Traits\DefaultTrait;
+use Illuminate\Support\Facades\Log;
 
 class ProductImagesController extends Controller
 {
@@ -150,7 +151,12 @@ class ProductImagesController extends Controller
             
             $imports = ImportedFileLog::where(['model_name'=>'productImage'])->get();
             return view('admin.product_images.import',compact('imports'));
-        }catch(\Exception $e){
+        }catch(\Throwable $e){
+            Log::error('Product images import failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => optional(auth()->user())->id,
+            ]);
             return back()->with('error', $e->getMessage());
         }
     }

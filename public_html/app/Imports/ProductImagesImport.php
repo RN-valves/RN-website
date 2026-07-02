@@ -40,20 +40,26 @@ use Importable, SkipsErrors;
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            $product = Product::where(['sku_code'=>$row['sku_code']])->first();
+            $skuCode = trim((string) ($row['sku_code'] ?? ''));
+            $image = trim((string) ($row['image'] ?? ''));
+            if ($skuCode === '' || $image === '') {
+                continue;
+            }
+
+            $product = Product::where(['sku_code' => $skuCode])->first();
             if(!empty($product)){
                 // $response = Http::get($row['image']);
                 // if ($response->successful()) {
                     ProductImage::updateOrCreate(
                         [
-                            'sku_code' => $row['sku_code'],
-                            'image' => $row['image'],
+                            'sku_code' => $skuCode,
+                            'image' => $image,
                         ],
                         [
-                            'image' => $row['image'],
-                            'sku_code' => $row['sku_code'],
+                            'image' => $image,
+                            'sku_code' => $skuCode,
                             'product_id' => $product['id'],
-                            'created_by' => auth()->user()->name,
+                            'created_by' => optional(auth()->user())->name ?? 'system',
                         ],
                     );
                 // }
@@ -63,12 +69,12 @@ use Importable, SkipsErrors;
 
     public function chunkSize(): int
     {
-        return 10000;
+        return 1000;
     }
 
     public function batchSize(): int
     {
-        return 10000;
+        return 1000;
     }
 
     // public function rules(): array

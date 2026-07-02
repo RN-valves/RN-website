@@ -12,6 +12,7 @@ use App\Models\{
     Order
 };
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\File;
 use GuzzleHttp\Client;
 
 function export_fast_excel($sheet, $sheetname){
@@ -39,7 +40,10 @@ function common_import_store(Request $request, $fieldname, $model_name){
         $randomName = str()->random(30);
         $name = $attachment->getClientOriginalName();
         $fileName = str($name, '-')->append($randomName)->slug().'.'.$attachment->getClientOriginalExtension();
-        $request->file($fieldname)->move(public_path('uploads/imports/'), $fileName);
+        $importPath = public_path('uploads/imports/');
+        // Prevent upload failures when the directory is missing on fresh deployments.
+        File::ensureDirectoryExists($importPath, 0775, true);
+        $request->file($fieldname)->move($importPath, $fileName);
        	$filePath = 'uploads/imports/'.$fileName;
 
        	$auth_id = auth()->user()->id;
