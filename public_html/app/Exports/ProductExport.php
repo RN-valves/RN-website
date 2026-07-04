@@ -62,6 +62,7 @@ class ProductExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
             'product_length', 'product_breadth', 'product_height', 'product_lbh_weight_gm',
             'mid_ctn_lbh_weight_kg', 'residential_warranty', 'commercial_warranty',
             'amazon_link', 'flipkart_link', 'short_description', 'video_url', 'is_full_turn', 'full_turn_code',
+            'master_ctn_lbh_weight_kg', 'status',
         ];
     }
 
@@ -117,6 +118,8 @@ class ProductExport implements FromQuery, WithHeadings, WithMapping, WithChunkRe
             optional($product->productAttribute)->video_url,
             $product->is_full_turn,
             $product->full_turn_code,
+            optional($product->productAttribute)->master_ctn_lbh_weight_kg,
+            $product->status,
         ];
     }
 }
