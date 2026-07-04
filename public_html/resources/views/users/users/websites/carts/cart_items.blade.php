@@ -52,9 +52,6 @@
                      <button type="button" class="qty-plus qtyPlus btnItemUpdate" data-cartid="{{$item->rowId}}"><font><i class="fa fa-plus"></i></font></button>
                   </div>
                </div>
-               @if($getSingleProId->productAttribute->stock_pcs<5)    
-               <div class="alrttexttt">Hurry! Only {{ $getSingleProId->productAttribute->stock_pcs??0 }} left!</div>
-               @endif
             </div>
          </div>
          <div class="cart_pro_thunbxx">

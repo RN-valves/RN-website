@@ -16,9 +16,6 @@
                <div class="prosize">Size: <b>{{ $item->options->size??'' }}</b></div>
                <div class="prosize">Qty: <b>{{$item->qty}}</b></div>
             </div>
-            @if($getSingleProId->productAttribute->stock_pcs<5)    
-            <div class="alrttexttt">Hurry! Only {{ $getSingleProId->productAttribute->stock_pcs??0 }} left!</div>
-            @endif
          </div>
       </div>
       <div class="cart_pro_thunbxx">
