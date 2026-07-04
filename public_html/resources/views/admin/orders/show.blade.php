@@ -322,6 +322,8 @@
          @include('admin.orders.partials.order_admin_actions')
 
          @include('admin.orders.partials.shipway')
+
+         @include('admin.orders.partials.order_status')
       </div>
    </div>
 </div>
