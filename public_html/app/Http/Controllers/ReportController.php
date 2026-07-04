@@ -104,6 +104,9 @@ class ReportController extends Controller
 
     public function productExportReports(Request $request)
     {
+        // Large exports can be memory-intensive; bump limits for this action
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
 
         $categoryInput = $request->input('category_ids', []);
         $subcategoryIds = $request->input('subcategory_ids', []);
@@ -116,4 +119,5 @@ class ReportController extends Controller
         return Excel::download(new ProductExport($categoryIds, $subcategoryIds, $isAllCategory), now().'products.xlsx');
        
     }
+
 }

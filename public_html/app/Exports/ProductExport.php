@@ -5,11 +5,11 @@ namespace App\Exports;
 use App\Models\Product;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class ProductExport implements FromQuery, WithHeadings, WithMapping
+class ProductExport implements FromQuery, WithHeadings, WithMapping, WithChunkReading
 {
     use Exportable;
 
@@ -19,9 +19,18 @@ class ProductExport implements FromQuery, WithHeadings, WithMapping
 
     public function __construct(array $categoryIds = [], array $subcategoryIds = [], bool $isAllCategory = false)
     {
-        $this->categoryIds = $categoryIds;
+        $this->categoryIds    = $categoryIds;
         $this->subcategoryIds = $subcategoryIds;
-        $this->isAllCategory = $isAllCategory;
+        $this->isAllCategory  = $isAllCategory;
+    }
+
+    /**
+     * Process records in chunks of 500 to avoid memory exhaustion
+     * when exporting all/multiple categories.
+     */
+    public function chunkSize(): int
+    {
+        return 500;
     }
 
     public function query()
@@ -52,7 +61,7 @@ class ProductExport implements FromQuery, WithHeadings, WithMapping
             'ctn_pcs', 'mid_ctn_pcs', 'inner_pcs', 'stock_pcs', 'only_product_wt_gm',
             'product_length', 'product_breadth', 'product_height', 'product_lbh_weight_gm',
             'mid_ctn_lbh_weight_kg', 'residential_warranty', 'commercial_warranty',
-            'amazon_link', 'flipkart_link', 'short_description', 'video_url','is_full_turn','full_turn_code'
+            'amazon_link', 'flipkart_link', 'short_description', 'video_url', 'is_full_turn', 'full_turn_code',
         ];
     }
 
@@ -90,22 +99,22 @@ class ProductExport implements FromQuery, WithHeadings, WithMapping
             $product->color_group_id,
             $product->product_combo_id,
             $product->product_size_id,
-            optional($product->ProductAttribute)->ctn_pcs,
-            optional($product->ProductAttribute)->mid_ctn_pcs,
-            optional($product->ProductAttribute)->inner_pcs,
-            optional($product->ProductAttribute)->stock_pcs,
-            optional($product->ProductAttribute)->only_product_wt_gm,
-            optional($product->ProductAttribute)->product_length,
-            optional($product->ProductAttribute)->product_breadth,
-            optional($product->ProductAttribute)->product_height,
-            optional($product->ProductAttribute)->product_lbh_weight_gm,
-            optional($product->ProductAttribute)->mid_ctn_lbh_weight_kg,
-            optional($product->ProductAttribute)->residential_warranty,
-            optional($product->ProductAttribute)->commercial_warranty,
-            optional($product->ProductAttribute)->amazon_link,
-            optional($product->ProductAttribute)->flipkart_link,
-            optional($product->ProductAttribute)->short_description,
-            optional($product->ProductAttribute)->video_url,
+            optional($product->productAttribute)->ctn_pcs,
+            optional($product->productAttribute)->mid_ctn_pcs,
+            optional($product->productAttribute)->inner_pcs,
+            optional($product->productAttribute)->stock_pcs,
+            optional($product->productAttribute)->only_product_wt_gm,
+            optional($product->productAttribute)->product_length,
+            optional($product->productAttribute)->product_breadth,
+            optional($product->productAttribute)->product_height,
+            optional($product->productAttribute)->product_lbh_weight_gm,
+            optional($product->productAttribute)->mid_ctn_lbh_weight_kg,
+            optional($product->productAttribute)->residential_warranty,
+            optional($product->productAttribute)->commercial_warranty,
+            optional($product->productAttribute)->amazon_link,
+            optional($product->productAttribute)->flipkart_link,
+            optional($product->productAttribute)->short_description,
+            optional($product->productAttribute)->video_url,
             $product->is_full_turn,
             $product->full_turn_code,
         ];
