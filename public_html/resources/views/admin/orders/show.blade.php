@@ -137,14 +137,18 @@
                      <td style="font-size: 18px;" class="@if($order->status=="Cancelled") text-white bg-danger @elseif($order->status=="Completed") bg-success text-white @endif">
                         <strong>{{ $order->status??'' }}</strong>
                      </td>
+                     <th>Fulfillment</th>
+                     <td><span class="bold-span">{{ $order->fulfillment_type ?? 'Delivery' }}</span></td>
+                  </tr>
+                  <tr>
                      <th>Is Payment?</th>
-                     <td>{{ $order->is_payment? 'Yes':"No" }}</td>
+                     <td>{{ $order->isPaid() ? 'Yes' : 'No' }}</td>
+                     <th>Payment Terms</th>
+                     <td><span class="bold-span">{{ $order->payment_term }}</span></td>
                   </tr>
                   <tr>
                      <th>Payment Key</th>
-                     <td>{{ $order->payment_key }}</td>
-                     <th>Payment Terms</th>
-                     <td><span class="bold-span">{{ $order->payment_term }}</span></td>
+                     <td colspan="3">{{ $order->payment_key }}</td>
                   </tr>
                   <tr>
                      <th>Note</th>
@@ -315,14 +319,9 @@
             </div>
          </div>
 
-         @include('admin.orders.partials.shipway')
-  
-         @can('orderTransport-create')
-         @if($order->status=="Pending" || $order->status=="In-Progress" || $order->status=="In-Transit" || $order->status=="Delivered")
-         @include('admin.orders.partials.order_status')
-         @endif
-         @endcan
+         @include('admin.orders.partials.order_admin_actions')
 
+         @include('admin.orders.partials.shipway')
       </div>
    </div>
 </div>
@@ -377,7 +376,7 @@ $(document).ready(function () {
       $('#courier_name').val(courierName);
       $('#delivery_charge').val(deliveryCharge);
       $('#cod_charge').val(codCharge);
-   x});
+   });
 });
 </script>
 @endsection

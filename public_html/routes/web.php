@@ -201,6 +201,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('ord/admin/get/carrier/rates', 'getCarrierRate')->name('orders.carrier.rate');
             Route::post('ord/admin/get/carrier/assign', 'AssignCarrier')->name('orders.carrier.assign');
             Route::post('ord/admin/get/generate/manifest', 'GenerateManifest')->name('orders.generate.manifest');
+            Route::post('ord/admin/mark-payment-received/{order}', 'markPaymentReceived')->name('orders.markPaymentReceived');
+            Route::post('ord/admin/set-store-pickup/{order}', 'setStorePickup')->name('orders.setStorePickup');
+            Route::post('ord/admin/complete-store-pickup/{order}', 'completeStorePickup')->name('orders.completeStorePickup');
+            Route::post('ord/admin/complete-without-shipway/{order}', 'completeWithoutShipway')->name('orders.completeWithoutShipway');
+            Route::post('ord/admin/update-order-status/{order}', 'updateOrderStatus')->name('orders.updateOrderStatus');
         });
 
         Route::controller(ProductBulletsController::class)->group(function(){

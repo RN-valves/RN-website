@@ -54,16 +54,27 @@ class OrderTransportController extends Controller
         $request->validate([
             'status' => ['required', Rule::in(['Pending','In-Progress','In-Transit','Delivered','Completed','Cancelled'])],
             'order_id' => ['required','exists:orders,id'],
-            'transport_name' => ['required_if:status,In-Transit,Delivered,Completed','max:155'],
-            'transport_contact' => ['required_if:status,In-Transit,Delivered,Completed','max:15'],
-            'transport_url' => ['required_if:status,In-Transit,Delivered,Completed','max:255'],
-            'order_tracking_id' => ['required_if:status,In-Transit,Delivered,Completed','max:55'],
-            'attachment' => ['required_if:status,In-Transit','max:2048'],
-            'invoice' => ['required_if:status,In-Transit','max:2048'],
+            'transport_name' => ['nullable','max:155'],
+            'transport_contact' => ['nullable','max:15'],
+            'transport_url' => ['nullable','max:255'],
+            'order_tracking_id' => ['nullable','max:55'],
+            'attachment' => ['nullable','max:2048'],
+            'invoice' => ['nullable','max:2048'],
         ]);
         try{
             $data = $request->all();
             $getSingleOrder = Order::getSingleOrder($data['order_id']);
+            if(empty($getSingleOrder)){
+                return back()->with('error', 'Order not found.');
+            }
+
+            if ($getSingleOrder->requiresTransportForStatus($data['status'])) {
+                $checkOdTransport = OrderTransport::where('order_id', $data['order_id'])->first();
+                if (empty($checkOdTransport)) {
+                    return back()->with('error', 'First need to update transport details for this order');
+                }
+            }
+
             if(!empty($getSingleOrder)){
 
                 $checkOdTransport = OrderTransport::where('order_id', $data['order_id'])->first();

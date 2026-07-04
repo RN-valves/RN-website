@@ -29,7 +29,7 @@ class OrderController extends Controller
     {
         $this->middleware(['permission:order-list'], ['only' => ['index']]);
         $this->middleware(['permission:order-create'], ['only' => ['create', 'store']]);
-        $this->middleware(['permission:order-edit'], ['only' => ['edit', 'update']]);
+        $this->middleware(['permission:order-edit'], ['only' => ['edit', 'update', 'markPaymentReceived', 'setStorePickup', 'completeStorePickup', 'completeWithoutShipway', 'updateOrderStatus']]);
         $this->middleware(['permission:order-delete'], ['only' => ['destroy']]);
     }
     /**
@@ -128,7 +128,7 @@ class OrderController extends Controller
             if($data['status']=="Delivered" || $data['status']=="In-Transit" || $data['status']=="Completed"){
                 $order_transport = OrderTransport::checkOrderTransport($order->id);
 
-                if(!empty($order_transport)){
+                if(!empty($order_transport) || !$order->requiresTransportForStatus($data['status'])){
                     $order->status = $data['status'];
                     $order->save();
 
@@ -425,6 +425,14 @@ class OrderController extends Controller
             ]);
             $gstcharge = ($request->cod_charge+$request->delivery_charge)*18/100;
             $order = Order::find($request->order_id);
+
+            if ($order->isStorePickup()) {
+                return back()->with('error', 'Store Pickup orders cannot be processed through Shipway.');
+            }
+
+            if ($order->isManualDelivery()) {
+                return back()->with('error', 'This order was completed without Shipway.');
+            }
             
             $reponse = order_push_shipway($order,$request);
             //Log::info("Data fetching order RNOD{$order->id}: " . $reponse);
@@ -472,6 +480,262 @@ class OrderController extends Controller
             return back()->with('success', 'Order manifest generate successfully!');
 
         }catch(\Exception $e){
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function markPaymentReceived(Order $order, Request $request)
+    {
+        $request->validate([
+            'payment_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            if ($order->isPaid()) {
+                return back()->with('error', 'Payment is already marked as received for this order.');
+            }
+
+            if (in_array($order->status, ['Completed', 'Cancelled'], true)) {
+                return back()->with('error', 'Cannot update payment on a completed or cancelled order.');
+            }
+
+            $order->is_payment = 'Complete';
+            if ($request->filled('payment_note')) {
+                $order->payment_note = $request->payment_note;
+            }
+            $movedToInProgress = ($order->status === 'Pending');
+            if ($movedToInProgress) {
+                $order->status = 'In-Progress';
+            }
+            $order->save();
+
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->user()->id,
+                'user_name' => auth()->user()->name,
+                'change_value' => 'Payment Received (Manual)' . ($request->payment_note ? ': ' . $request->payment_note : ''),
+                'change_type' => 'payment',
+            ]);
+
+            if ($movedToInProgress) {
+                OrderLog::create([
+                    'order_id' => $order->id,
+                    'user_id' => auth()->user()->id,
+                    'user_name' => auth()->user()->name,
+                    'change_value' => 'In-Progress',
+                    'change_type' => 'status',
+                ]);
+            }
+
+            return back()->with('success', $movedToInProgress
+                ? 'Payment marked as received. Order moved to In-Progress.'
+                : 'Payment marked as received successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function setStorePickup(Order $order)
+    {
+        try {
+            if ($order->isStorePickup()) {
+                return back()->with('error', 'This order is already marked as Store Pickup.');
+            }
+
+            if (in_array($order->status, ['In-Transit', 'Delivered', 'Completed', 'Cancelled'], true)) {
+                return back()->with('error', 'Cannot change fulfillment type for this order status.');
+            }
+
+            if (!empty($order->delivery_charge) && $order->delivery_charge > 0) {
+                return back()->with('error', 'Cannot mark as Store Pickup after a shipping label has been generated.');
+            }
+
+            $order->fulfillment_type = 'Store Pickup';
+            $order->save();
+
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->user()->id,
+                'user_name' => auth()->user()->name,
+                'change_value' => 'Store Pickup',
+                'change_type' => 'fulfillment',
+            ]);
+
+            return back()->with('success', 'Order marked as Store Pickup. Shipway is no longer required.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function completeStorePickup(Order $order, Request $request)
+    {
+        $request->validate([
+            'payment_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            if ($order->status === 'Completed') {
+                return back()->with('error', 'This order is already completed.');
+            }
+
+            if (in_array($order->status, ['Cancelled'], true)) {
+                return back()->with('error', 'Cannot complete a cancelled order.');
+            }
+
+            if (!empty($order->delivery_charge) && $order->delivery_charge > 0) {
+                return back()->with('error', 'Cannot use Store Pickup — a Shipway shipping label already exists. Use parcel status buttons below.');
+            }
+
+            if (!$order->isStorePickup()) {
+                $order->fulfillment_type = 'Store Pickup';
+                OrderLog::create([
+                    'order_id' => $order->id,
+                    'user_id' => auth()->user()->id,
+                    'user_name' => auth()->user()->name,
+                    'change_value' => 'Store Pickup',
+                    'change_type' => 'fulfillment',
+                ]);
+            }
+
+            if (!$order->isPaid()) {
+                $order->is_payment = 'Complete';
+                if ($request->filled('payment_note')) {
+                    $order->payment_note = $request->payment_note;
+                }
+
+                OrderLog::create([
+                    'order_id' => $order->id,
+                    'user_id' => auth()->user()->id,
+                    'user_name' => auth()->user()->name,
+                    'change_value' => 'Payment Received at Pickup' . ($request->payment_note ? ': ' . $request->payment_note : ''),
+                    'change_type' => 'payment',
+                ]);
+            }
+
+            $order->status = 'Completed';
+            $order->save();
+
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->user()->id,
+                'user_name' => auth()->user()->name,
+                'change_value' => 'Completed (Customer collected from shop)',
+                'change_type' => 'status',
+            ]);
+
+            return back()->with('success', 'Done — customer collected order from shop. Status: Completed.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function completeWithoutShipway(Order $order, Request $request)
+    {
+        $request->validate([
+            'payment_note' => ['nullable', 'string', 'max:500'],
+            'status_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            if ($order->status === 'Completed') {
+                return back()->with('error', 'This order is already completed.');
+            }
+
+            if ($order->status === 'Cancelled') {
+                return back()->with('error', 'Cannot complete a cancelled order.');
+            }
+
+            if (!empty($order->delivery_charge) && $order->delivery_charge > 0) {
+                return back()->with('error', 'Shipway label already exists for this order.');
+            }
+
+            if (!$order->isPaid()) {
+                $order->is_payment = 'Complete';
+                if ($request->filled('payment_note')) {
+                    $order->payment_note = $request->payment_note;
+                }
+
+                OrderLog::create([
+                    'order_id' => $order->id,
+                    'user_id' => auth()->user()->id,
+                    'user_name' => auth()->user()->name,
+                    'change_value' => 'Payment Received (Manual)' . ($request->payment_note ? ': ' . $request->payment_note : ''),
+                    'change_type' => 'payment',
+                ]);
+            }
+
+            $order->fulfillment_type = 'Manual Delivery';
+            $order->status = 'Completed';
+            $order->save();
+
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->user()->id,
+                'user_name' => auth()->user()->name,
+                'change_value' => 'Manual Delivery',
+                'change_type' => 'fulfillment',
+            ]);
+
+            $logStatus = 'Completed (Delivered without Shipway)';
+            if ($request->filled('status_note')) {
+                $logStatus .= ' — ' . $request->status_note;
+            }
+
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->user()->id,
+                'user_name' => auth()->user()->name,
+                'change_value' => $logStatus,
+                'change_type' => 'status',
+            ]);
+
+            return back()->with('success', 'Order completed without Shipway.');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function updateOrderStatus(Order $order, Request $request)
+    {
+        $request->validate([
+            'status' => ['required', Rule::in(Order::orderStatuses())],
+            'status_note' => ['nullable', 'string', 'max:500'],
+            'confirm_shipway' => ['nullable', 'boolean'],
+        ]);
+
+        try {
+            if ($order->status === 'Cancelled') {
+                return back()->with('error', 'Cancelled orders cannot be updated.');
+            }
+
+            $newStatus = $request->status;
+            $confirmShipway = $request->boolean('confirm_shipway');
+
+            if ($order->requiresTransportForStatus($newStatus) && !$confirmShipway) {
+                return back()->with('error', 'Transport/Shipway details missing. Tick "Already shipped via Shipway" to update status manually.');
+            }
+
+            $order->status = $newStatus;
+            $order->save();
+
+            $logValue = $newStatus;
+            if ($request->filled('status_note')) {
+                $logValue .= ' — ' . $request->status_note;
+            }
+            if ($confirmShipway && !$order->hasShipwayData()) {
+                $logValue .= ' (Manual — Shipway confirmed by admin)';
+            }
+
+            OrderLog::create([
+                'order_id' => $order->id,
+                'user_id' => auth()->user()->id,
+                'user_name' => auth()->user()->name,
+                'change_value' => $logValue,
+                'change_type' => 'status',
+            ]);
+
+            return back()->with('success', 'Order status updated to ' . $newStatus . '.');
+        } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
     }

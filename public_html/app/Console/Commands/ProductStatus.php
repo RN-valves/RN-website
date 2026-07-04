@@ -15,7 +15,12 @@ class ProductStatus extends Command
     public function handle()
     {
         try {
-            $orders = Order::where('delivery_charge','>',0)->whereNotIn('status', ['Delivered', 'RTO Delivered', 'Canceled', 'Return Delivered'])
+            $orders = Order::where('delivery_charge','>',0)
+                ->where(function ($query) {
+                    $query->where('fulfillment_type', 'Delivery')
+                        ->orWhereNull('fulfillment_type');
+                })
+                ->whereNotIn('status', ['Delivered', 'RTO Delivered', 'Canceled', 'Return Delivered', 'Completed'])
                 ->select('id', 'user_id', 'status')
                 ->with('user:id,name')
                 ->get();

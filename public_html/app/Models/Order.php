@@ -49,6 +49,54 @@ class Order extends Model
         return array('Pending','In-Progress','In-Transit','Delivered','Completed','Cancelled');
     }
 
+    public static function fulfillmentTypes(){
+        return ['Delivery', 'Store Pickup', 'Manual Delivery'];
+    }
+
+    public function isPaid(): bool
+    {
+        return in_array($this->is_payment, [1, '1', 'Complete', 'Yes'], true);
+    }
+
+    public function isStorePickup(): bool
+    {
+        return $this->fulfillment_type === 'Store Pickup';
+    }
+
+    public function isManualDelivery(): bool
+    {
+        return $this->fulfillment_type === 'Manual Delivery';
+    }
+
+    public function skipsShipway(): bool
+    {
+        return $this->isStorePickup() || $this->isManualDelivery();
+    }
+
+    public function hasShipwayData(): bool
+    {
+        return ($this->delivery_charge > 0)
+            || !empty($this->orderTransort)
+            || ($this->package_length > 0);
+    }
+
+    public function requiresTransportForStatus(string $status): bool
+    {
+        if ($this->isStorePickup()) {
+            return in_array($status, ['In-Transit', 'Delivered'], true);
+        }
+
+        if ($this->isManualDelivery()) {
+            return false;
+        }
+
+        if (in_array($status, ['In-Transit', 'Delivered', 'Completed'], true)) {
+            return !$this->hasShipwayData();
+        }
+
+        return false;
+    }
+
     public static function getOrderWeekly(){
         return Order::query()
             ->whereNotIn('status', ['Pending','Cancelled'])

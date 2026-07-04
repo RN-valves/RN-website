@@ -1,5 +1,5 @@
 
-@if($order->is_payment == 1 || $order->is_payment == 'Complete')
+@if(($order->is_payment == 1 || $order->is_payment == 'Complete') && !$order->skipsShipway())
 <div class="col-lg-12">
    <div class="card-title border px-2">
       <h5 class="mb-0">
