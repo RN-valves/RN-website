@@ -49,16 +49,14 @@ use Importable, SkipsErrors,SkipsFailures;
           if($subcategory){
             $product = Product::where(['sku_code'=>$row['sku_code']])->first();
             $color = Color::where(['name'=>$row['color_name']])->first();
-            if(empty($product)){
+            $isNew = empty($product);
+            if($isNew){
                 $uuid = str()->uuid()->toString();
             }else{
                 $uuid = $product->uuid;
-            }  
-            $product = Product::updateOrCreate(
-                [
-                    'sku_code' => $row['sku_code'],
-                ],
-                [
+            }
+
+            $productData = [
                     'sku_code' => $row['sku_code'],
                     'in_mrp' => isset($row['in_mrp']) ? round((float)$row['in_mrp'], 2) : 0.0,
                     'in_selling' => isset($row['in_selling']) ? round((float)$row['in_selling'], 2) : 0.0,
@@ -89,15 +87,33 @@ use Importable, SkipsErrors,SkipsFailures;
                     'keywords' => $row['keywords'],
                     'description' => $row['description'],
                     'search_keywords' => $row['search_keywords'],
-                    'is_visible_website' => (isset($row['is_visible_website']) && $row['is_visible_website'] !== '') ? (int)$row['is_visible_website'] : 0,
-                    'is_visible_api' => (isset($row['is_visible_api']) && $row['is_visible_api'] !== '') ? (int)$row['is_visible_api'] : 0,
-                    'new_arrival' => (isset($row['new_arrival']) && $row['new_arrival'] !== '') ? (int)$row['new_arrival'] : 0,
-                    'is_featured' => (isset($row['is_featured']) && $row['is_featured'] !== '') ? (int)$row['is_featured'] : 0,
                     'is_full_turn' => (int)($row['is_full_turn'] ?? 0),
                     'full_turn_code' => $row['full_turn_code'] ?? '0',
                     'sale_type' => $row['sale_type'] ?? 'BASS',
-                    'status' => $row['status'] ?? 'Active',
+            ];
+
+            // Preserve admin visibility/status on Excel re-import unless column is explicitly set
+            $productData['is_visible_website'] = (isset($row['is_visible_website']) && $row['is_visible_website'] !== '')
+                ? (int) $row['is_visible_website']
+                : ($isNew ? 0 : (int) $product->is_visible_website);
+            $productData['is_visible_api'] = (isset($row['is_visible_api']) && $row['is_visible_api'] !== '')
+                ? (int) $row['is_visible_api']
+                : ($isNew ? 0 : (int) $product->is_visible_api);
+            $productData['new_arrival'] = (isset($row['new_arrival']) && $row['new_arrival'] !== '')
+                ? (int) $row['new_arrival']
+                : ($isNew ? 0 : (int) $product->new_arrival);
+            $productData['is_featured'] = (isset($row['is_featured']) && $row['is_featured'] !== '')
+                ? (int) $row['is_featured']
+                : ($isNew ? 0 : (int) $product->is_featured);
+            $productData['status'] = (isset($row['status']) && $row['status'] !== '')
+                ? $row['status']
+                : ($isNew ? 'Active' : $product->status);
+
+            $product = Product::updateOrCreate(
+                [
+                    'sku_code' => $row['sku_code'],
                 ],
+                $productData,
             );
 
             $this->updateProductUrl($product->id);

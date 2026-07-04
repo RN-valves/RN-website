@@ -161,12 +161,22 @@ trait DefaultTrait
 
     public function productStockStatus($poroductId){
         $product = Product::whereId($poroductId)->first();
-        if($product->productAttribute->stock_pcs>0){
-            $status = "Active";
-        }else{
+        if (!$product || !$product->productAttribute) {
+            return;
+        }
+
+        // Never auto-change products admin manually disabled
+        if (in_array($product->status, ['InActive', 'Discontinued'], true)) {
+            return;
+        }
+
+        if ($product->productAttribute->stock_pcs > 0) {
+            $status = 'Active';
+        } else {
             $status = 'Out-of-Stock';
         }
-        return Product::whereId($poroductId)->update(['status'=>$status]);
+
+        return Product::whereId($poroductId)->update(['status' => $status]);
     }
 
     public function productsStatusUpdateSubCategory($subcategoryId){
@@ -175,7 +185,13 @@ trait DefaultTrait
             return;
         }
 
-        return Product::where(['subcategory_id'=>$subcategoryId])->update([
+        // Only propagate HIDING from subcategory → products.
+        // Never re-enable products that were individually hidden in admin.
+        if ($subCategory->status !== 'InActive' && (int) $subCategory->is_visible_website !== 0) {
+            return;
+        }
+
+        return Product::where(['subcategory_id' => $subcategoryId])->update([
             'is_visible_website' => $subCategory->is_visible_website,
             'status' => $subCategory->status,
         ]);
