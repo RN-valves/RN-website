@@ -74,7 +74,7 @@ $("#subcategory_id").select2({
       let categoryIds = $(this).val(); // Get the value directly
 
         // Clear the subcategory dropdown
-        $("#subcategory_id").html();
+        $("#subcategory_id").html('');
       if (categoryIds && categoryIds.length > 0) {
         $.ajax({
             url: '{{ route('product.reports.subcategory') }}',
