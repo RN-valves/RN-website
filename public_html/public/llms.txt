@@ -1,8 +1,8 @@
 # RN Valves
 
-> High-grade engineering polymer and CP taps, accessories, and more for modern bathrooms and kitchens.
+> High-grade PTMT & CP taps, health faucets, showers, expose showers, accessories, and more for modern bathrooms and kitchens.
 
-RN Valves is a manufacturer and supplier of a wide range of plumbing fixtures and accessories, specializing in PTMT (High Grade Engineering Polymer) and CP (Chrome Plated) products. Their offerings include various types of taps, faucets, shower sets, hoses, cisterns, seat covers, and bathroom accessories. The brand caters to both individual consumers looking to renovate or build their homes, as well as potentially B2B clients like plumbers, contractors, and retailers.
+RN Valves is a manufacturer and supplier of a wide range of plumbing fixtures and accessories, specializing in PTMT (High Grade Engineering Polymer) and CP (Chrome Plated) products. Their offerings include various types of taps, faucets, health faucets, showers, expose showers, shower sets, hoses, cisterns, seat covers, and bathroom accessories. The brand caters to both individual consumers looking to renovate or build their homes, as well as potentially B2B clients like plumbers, contractors, and retailers.
 
 The core value proposition of RN Valves lies in providing durable, high-quality, and aesthetically pleasing plumbing solutions. They emphasize the use of engineering polymers and chrome plating to ensure longevity and a premium finish. Key use cases for their products include equipping new constructions, renovating existing bathrooms and kitchens, and maintaining plumbing systems. The website serves as a product catalog and information hub, allowing users to explore their extensive product lines and potentially make direct inquiries or purchases.
 
@@ -10,7 +10,7 @@ When interacting with an LLM about RN Valves, it's important to understand that 
 
 ## Core Product Categories
 
-- [PTMT | High Grade Engineering Polymer Taps | CP taps | PTMT & CP tap manufacturer | RN Faucet](https://rnvalves.com/): Explore PTMT and CP taps, accessories, and more from RN Valves.
+- [PTMT & CP Tap Manufacturer | Showers & Health Faucets | Bathroom Fittings | RN Valves & Faucets](https://rnvalves.com/): Explore PTMT and CP taps, health faucets, showers, expose showers, and CP & PTMT accessories from RN Valves.
 - [PTMT Hoses & Garden Pipes](https://rnvalves.com/ptmt-hoses-garden-pipes): View PTMT and PVC hoses, garden pipes, and related connection accessories.
 - [Health & Hygiene Products](https://rnvalves.com/health-hygiene): Discover soap dispensers, jet sprays, health faucets, and hand/hair dryers.
 - [Exposed Shower Set & Diverter Panel](https://rnvalves.com/exposed-shower-set-diverter-panel): Browse exposed shower sets, shower panels, and diverter systems.

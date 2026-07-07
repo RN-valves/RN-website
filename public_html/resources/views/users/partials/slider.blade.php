@@ -144,7 +144,7 @@ $sliders = App\Models\Slider::where('status','Active')->limit(3)->get();
             {{-- commmon section for video start --}}
             <div class="overlay" style="pointer-events: none;">
                <div class="overlay-col" style="pointer-events: auto;">
-                  <h2 id="bannerHeading">PTMT|High Grade Engineering Polymer Taps: Durable Elegance for Every Flow – RN Valves & Faucets</h2>
+                  <h2 id="bannerHeading">PTMT Faucets | CP Faucets | Shower | Health Faucets | CP Accessories | PTMT Accessories | Expose Shower | High Grade Engineering Polymer Taps: Durable Elegance for Every Flow – RN Valves & Faucets</h2>
                   <a id="bannerLink" class="explore-btn" href="{{url('/ptmt-taps-or-faucets')}}">Explore Now</a>
                </div>
             </div>
@@ -170,7 +170,7 @@ $sliders = App\Models\Slider::where('status','Active')->limit(3)->get();
                   
                   const textContent = [
                      {
-                        heading: "PTMT|High Grade Engineering Polymer Taps: Durable Elegance for Every Flow – RN Valves & Faucets",
+                        heading: "PTMT Faucets | CP Faucets | Shower | Health Faucets | CP Accessories | PTMT Accessories | Expose Shower | High Grade Engineering Polymer Taps: Durable Elegance for Every Flow – RN Valves & Faucets",
                         link: "{{url('/ptmt-taps-or-faucets')}}",
                         linkText: "Explore Now"
                      },

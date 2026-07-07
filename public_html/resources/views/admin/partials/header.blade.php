@@ -18,7 +18,7 @@
   @yield('seo_title')
 
   <!-- Favicons -->
-  <link href="{{ url('admin/assets/img/favicon.png') }}" rel="icon">
+  <link href="{{ url('users/assets/images/logo.png') }}" rel="icon">
   <link href="{{ url('admin/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->

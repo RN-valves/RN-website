@@ -91,8 +91,8 @@
       "@type": "WebPage",
       "@id": "https://rnvalves.com/#webpage",
       "url": "https://rnvalves.com",
-      "name": "{{ frontPage()->title??'PTMT & CP Tap Manufacturer | Bathroom Fittings | RN Valves & Faucets' }}",
-      "description": "{{ frontPage()->description??'RN Valves & Faucets – India\'s leading manufacturer of PTMT taps, CP taps, showers, valves, sensor faucets, and bathroom accessories.' }}",
+      "name": "{{ frontPage()->title??'PTMT & CP Tap Manufacturer | Showers & Health Faucets | Bathroom Fittings | RN Valves & Faucets' }}",
+      "description": "{{ frontPage()->description??'RN Valves & Faucets – India\'s leading manufacturer of PTMT taps, CP taps, showers, health faucets, expose showers, valves, sensor faucets, and bathroom accessories.' }}",
       "isPartOf": { "@id": "https://rnvalves.com/#website" },
       "about": { "@id": "https://rnvalves.com/#organization" },
       "breadcrumb": {
@@ -243,7 +243,7 @@
           "name": "What products does RN Valves & Faucets manufacture?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "RN Valves & Faucets manufactures Brass & PTMT bath fittings including PTMT taps, CP taps, sensor faucets, showers, overhead showers, valves, bathroom accessories, and allied products. They offer 7000+ products."
+            "text": "RN Valves & Faucets manufactures Brass & PTMT bath fittings including PTMT taps, CP taps, health faucets, showers, expose showers, sensor faucets, valves, CP and PTMT bathroom accessories, and allied products. They offer 7000+ products."
           }
         },
         {
@@ -619,7 +619,7 @@
          <div class="col-lg-10 m-auto">
             <!-- Section Title Wrap -->
             <div class="premium-hero-text text-center" style="margin-bottom: 60px;">
-               <h1>PTMT | <strong>High Grade Engineering Polymer Taps</strong></h1>
+               <h1>PTMT Faucets | CP Faucets | Shower | Health Faucets | CP Accessories | PTMT Accessories | Expose Shower | <strong>High Grade Engineering Polymer Taps</strong></h1>
 
                {{-- Typewriter line --}}
                <h2 style="font-size: 1.5rem; color: #555; font-weight: 300; margin-top: 18px; letter-spacing: 1px;">
@@ -641,7 +641,7 @@
                }
                </style>
 
-               <p>The primary purpose of providing high-quality products with affordability, RN Valves deals with value for money products, with the core vision of growing our brand in every Indian household and making it available for every class of our society.</p>
+               <p>From High Grade PTMT & CP Faucets to premium Showers, Health Faucets, and Expose Showers, RN Valves deals with value for money products. Our core vision is to grow our brand in every Indian household and make our complete range of elegant accessories available for every class of our society.</p>
 
                 {{-- Typewriter script moved to bottom scripts section --}}
             </div>
@@ -770,7 +770,7 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-   var words      = ['Durability.', 'Elegance.', 'Performance.', 'Reliability.', 'Innovation.'];
+   var words      = ['Premium Showers.', 'Health Faucets.', 'Durable PTMT.', 'Elegant CP Accessories.', 'Innovation.', 'Reliability.'];
    var el         = document.getElementById('typewriter-word');
    if (!el) return;
    var wi = 0, ci = 0, deleting = false;

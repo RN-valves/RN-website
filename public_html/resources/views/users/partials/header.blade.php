@@ -16,9 +16,9 @@
       <meta name="author" content="RN Valves & Faucets">
       <!-- Favicon and Touch Icons-->
 
-      <link rel="apple-touch-icon" sizes="180x180" href="{{url('users/images/android-chrome-192x192.png')}}">
-      <link rel="icon" type="image/png" sizes="32x32" href="{{ url('users/images/favicon-32x32.png') }}">
-      <link rel="icon" type="image/png" sizes="16x16" href="{{ url('users/images/favicon.ico') }}">
+      <link rel="apple-touch-icon" sizes="180x180" href="{{url('users/assets/images/logo.png')}}">
+      <link rel="icon" type="image/png" sizes="32x32" href="{{ url('users/assets/images/logo.png') }}">
+      <link rel="icon" type="image/png" sizes="16x16" href="{{ url('users/assets/images/logo.png') }}">
       <link rel="stylesheet" type="text/css" href="{{url('users/assets/css/flaticon.css')}}">
       <link rel="stylesheet" type="text/css" href="{{url('users/assets/css/fontawesome.min.css')}}">
       <link rel="stylesheet" type="text/css" href="{{url('users/assets/css/animate.css')}}">
