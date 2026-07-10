@@ -597,6 +597,11 @@
          .glass-banner { padding: 30px; margin: 40px 20px; border-radius: 20px; }
          .premium-hero-text h1 { font-size: 2.2rem; }
       }
+      @media (max-width: 767px) {
+         .premium-hero-text h1 { font-size: 1.5rem !important; line-height: 1.3; }
+         .premium-hero-text h2 { font-size: 1.1rem !important; }
+         .premium-hero-text p { font-size: 0.95rem !important; line-height: 1.6; margin: 15px auto !important; padding: 0 10px; }
+      }
    </style>
 
     <!-- <div class="popup-overlay" id="popup">

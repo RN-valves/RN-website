@@ -67,9 +67,7 @@ $url = url()->current();
             <!--Navbar Area Start Here-->
             <nav class="navbar navbar-area navbar-expand-lg style-02">
                <div class="container-fluid nav-container dsktop_right_pad">
-                  <button class="navbar-toggler" type="button" data-toggle="collapse"
-                     data-target="#autoshop_main_menu" aria-expanded="false"
-                     aria-label="Toggle navigation">
+                  <button class="navbar-toggler" type="button" onclick="rnToggleNav(this)" aria-label="Toggle navigation" aria-expanded="false">
                   <span class="humberger-menu black">
                   <span class="one"></span>
                   <span class="two"></span>
@@ -184,14 +182,14 @@ $url = url()->current();
                         <li class="{{ $url==route('news',['url_key' => 'news'])? 'current-menu-item': '' }}"><a href="{{route('news',['url_key' => 'news'])}}">Media</a></li>
                      </ul>
                   </div>
-                  <!-------Mobile Menu-------------->
-                  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <!-------Mobile Menu-------------->                  
+                  <div id="navbarSupportedContent" class="rn-mobile-nav">
                      <ul class="navbar-nav ml-auto py-4 py-md-0">
                         <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
                            <a class="nav-link" href="{{route('welcome')}}">Home</a>
                         </li>
                         <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="https://rnvalves.com/#" role="button" aria-haspopup="true" aria-expanded="false">Our Products</a>
+                           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)" role="button" aria-haspopup="true" aria-expanded="false">Our Products</a>
                            <div class="dropdown-menu twobxss">
                               @foreach(ActiveCategories()??'' as $ACategory)
                               <a href="{{ route('productList', $ACategory) }}">
@@ -202,19 +200,6 @@ $url = url()->current();
                               <div class="clerbx"></div>
                            </div>
                         </li>
-                        {{-- 
-                        <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                           <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Our Products</a>
-                           <div class="dropdown-menu">
-                              @foreach(ActiveCategories()??'' as $ACategory)
-                              <a class="dropdown-item" href="{{ route('productList', $ACategory) }}">{{ $ACategory->name??'' }}</a>
-                              @endforeach
-                           </div>
-                        </li>
-                        --}}
-                        {{-- <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
-                           <a class="nav-link" href="{{route('catalogue')}}">Our Catalog</a>
-                        </li> --}}
                         <li class="nav-item pl-4 pl-md-0 ml-0 ml-md-4">
                            <a class="nav-link" href="{{route('aboutUs')}}">About RN Valves</a>
                         </li>
@@ -237,8 +222,9 @@ $url = url()->current();
                            <a class="nav-link" href="{{ route('news',['url_key' => 'news']) }}">Media</a>
                         </li>
                      </ul>
-                  </div>   
+                  </div>
                   <!-------Mobile Menu-------------->
+
                   <!--Nav Right Content-->
                   <style>
                      @media (max-width: 991px) {
@@ -305,6 +291,89 @@ $url = url()->current();
          <!--// header Bottom-->
       </div>
    </div>
+                   {{-- Mobile nav toggle CSS + JS --}}
+                   <style>
+                      @media (max-width: 991px) {
+                         #navbarSupportedContent.rn-mobile-nav {
+                            display: none;
+                            width: 100%;
+                            position: absolute;
+                            top: 100%;
+                            left: 0;
+                            right: 0;
+                            background: #ffffff;
+                            z-index: 9000;
+                            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+                            border-top: 3px solid #00a0e3;
+                            max-height: 80vh;
+                            overflow-y: auto;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav.rn-open {
+                            display: block !important;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav .navbar-nav {
+                            flex-direction: column !important;
+                            padding: 8px 0 !important;
+                            margin: 0 !important;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav .nav-item {
+                            border-bottom: 1px solid #f0f0f0;
+                            padding-left: 0 !important;
+                            margin: 0 !important;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav .nav-link {
+                            padding: 13px 20px !important;
+                            font-size: 15px !important;
+                            font-weight: 600 !important;
+                            color: #1a1a1a !important;
+                            display: block;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav .nav-link:hover {
+                            background: #f4f7fb;
+                            color: #003366 !important;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav .dropdown-menu {
+                            position: static !important;
+                            float: none !important;
+                            width: 100% !important;
+                            box-shadow: none !important;
+                            border: none !important;
+                            background: #f4f7fb !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                         }
+                         #navbarSupportedContent.rn-mobile-nav .dropdown-menu.show {
+                            display: block !important;
+                         }
+                      }
+                      @media (min-width: 992px) {
+                         #navbarSupportedContent.rn-mobile-nav {
+                            display: none !important;
+                         }
+                      }
+                   </style>
+                   <script>
+                   function rnToggleNav(btn) {
+                      var nav = document.getElementById('navbarSupportedContent');
+                      if (!nav) return;
+                      var isOpen = nav.classList.contains('rn-open');
+                      if (isOpen) {
+                         nav.classList.remove('rn-open');
+                         btn.setAttribute('aria-expanded', 'false');
+                      } else {
+                         nav.classList.add('rn-open');
+                         btn.setAttribute('aria-expanded', 'true');
+                      }
+                   }
+                   document.addEventListener('click', function(e) {
+                      var nav = document.getElementById('navbarSupportedContent');
+                      var btn = document.querySelector('.navbar-toggler');
+                      if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+                         nav.classList.remove('rn-open');
+                         btn.setAttribute('aria-expanded', 'false');
+                      }
+                   });
+                   </script>
 </header>
 <!--// Main Header End Here-->
 <!--Slider Area Start-->
