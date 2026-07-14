@@ -1,18 +1,14 @@
 <?php
 
 namespace App\Imports;
-use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\Importable;
-use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Validation\Rule;
 
 use App\Models\{
     ProductImage,
@@ -22,7 +18,6 @@ use App\Traits\DefaultTrait;
 
 class ProductImagesImport implements 
     ToCollection,
-    // WithValidation,
     WithHeadingRow,
     WithChunkReading,
     WithBatchInserts,
@@ -39,6 +34,18 @@ use Importable, SkipsErrors;
     
     public function collection(Collection $rows)
     {
+        // Prefetch products for this chunk to avoid N+1 lookups (keeps large Excel uploads fast)
+        $skuCodes = $rows
+            ->map(fn ($row) => trim((string) ($row['sku_code'] ?? '')))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        $productsBySku = Product::whereIn('sku_code', $skuCodes)
+            ->get()
+            ->keyBy('sku_code');
+
         foreach ($rows as $row) {
             $skuCode = trim((string) ($row['sku_code'] ?? ''));
             $image = trim((string) ($row['image'] ?? ''));
@@ -46,13 +53,8 @@ use Importable, SkipsErrors;
                 continue;
             }
 
-            $product = Product::where(['sku_code' => $skuCode])->first();
-            if(!empty($product)){
-                // Skip URLs that do not resolve to a real image (prevents broken thumbnails)
-                if (!$this->imageUrlExists($image)) {
-                    continue;
-                }
-
+            $product = $productsBySku->get($skuCode);
+            if (!empty($product)) {
                 ProductImage::updateOrCreate(
                     [
                         'sku_code' => $skuCode,
@@ -69,50 +71,13 @@ use Importable, SkipsErrors;
         }
     }
 
-    /**
-     * Confirm the image URL returns a successful HTTP response before saving.
-     */
-    protected function imageUrlExists(string $imageUrl): bool
-    {
-        try {
-            $response = Http::timeout(8)
-                ->withOptions(['allow_redirects' => true, 'verify' => false])
-                ->head($imageUrl);
-
-            if ($response->successful()) {
-                return true;
-            }
-
-            // Some CDNs reject HEAD; retry with a lightweight GET range if needed
-            $response = Http::timeout(8)
-                ->withOptions(['allow_redirects' => true, 'verify' => false])
-                ->withHeaders(['Range' => 'bytes=0-0'])
-                ->get($imageUrl);
-
-            return $response->successful() || $response->status() === 206;
-        } catch (\Throwable $e) {
-            return false;
-        }
-    }
-
     public function chunkSize(): int
     {
-        return 1000;
+        return 500;
     }
 
     public function batchSize(): int
     {
-        return 1000;
+        return 500;
     }
-
-    // public function rules(): array
-    // {
-    //     return [
-    //         'sku_code' => ['required','exists:products,sku_code'],
-    //         'image' => ['required','max:255','string'],
-
-    //         '*.sku_code' => ['required','exists:products,sku_code'],
-    //         '*.image' => ['required','max:255','string'],
-    //     ];
-    // }
 }
