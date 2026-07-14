@@ -92,10 +92,9 @@ use Importable, SkipsErrors,SkipsFailures;
                     'sale_type' => $row['sale_type'] ?? 'BASS',
             ];
 
-            // Preserve admin visibility/status on Excel re-import unless column is explicitly set
-            $productData['is_visible_website'] = (isset($row['is_visible_website']) && $row['is_visible_website'] !== '')
-                ? (int) $row['is_visible_website']
-                : ($isNew ? 0 : (int) $product->is_visible_website);
+            // Empty/blank is_visible_website = hidden (0); only 1 keeps product visible
+            $visibleWeb = isset($row['is_visible_website']) ? trim((string) $row['is_visible_website']) : '';
+            $productData['is_visible_website'] = ($visibleWeb !== '') ? (int) $visibleWeb : 0;
             $productData['is_visible_api'] = (isset($row['is_visible_api']) && $row['is_visible_api'] !== '')
                 ? (int) $row['is_visible_api']
                 : ($isNew ? 0 : (int) $product->is_visible_api);
