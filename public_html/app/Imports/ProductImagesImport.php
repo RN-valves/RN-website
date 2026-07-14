@@ -48,22 +48,50 @@ use Importable, SkipsErrors;
 
             $product = Product::where(['sku_code' => $skuCode])->first();
             if(!empty($product)){
-                // $response = Http::get($row['image']);
-                // if ($response->successful()) {
-                    ProductImage::updateOrCreate(
-                        [
-                            'sku_code' => $skuCode,
-                            'image' => $image,
-                        ],
-                        [
-                            'image' => $image,
-                            'sku_code' => $skuCode,
-                            'product_id' => $product['id'],
-                            'created_by' => optional(auth()->user())->name ?? 'system',
-                        ],
-                    );
-                // }
+                // Skip URLs that do not resolve to a real image (prevents broken thumbnails)
+                if (!$this->imageUrlExists($image)) {
+                    continue;
+                }
+
+                ProductImage::updateOrCreate(
+                    [
+                        'sku_code' => $skuCode,
+                        'image' => $image,
+                    ],
+                    [
+                        'image' => $image,
+                        'sku_code' => $skuCode,
+                        'product_id' => $product['id'],
+                        'created_by' => optional(auth()->user())->name ?? 'system',
+                    ],
+                );
             }
+        }
+    }
+
+    /**
+     * Confirm the image URL returns a successful HTTP response before saving.
+     */
+    protected function imageUrlExists(string $imageUrl): bool
+    {
+        try {
+            $response = Http::timeout(8)
+                ->withOptions(['allow_redirects' => true, 'verify' => false])
+                ->head($imageUrl);
+
+            if ($response->successful()) {
+                return true;
+            }
+
+            // Some CDNs reject HEAD; retry with a lightweight GET range if needed
+            $response = Http::timeout(8)
+                ->withOptions(['allow_redirects' => true, 'verify' => false])
+                ->withHeaders(['Range' => 'bytes=0-0'])
+                ->get($imageUrl);
+
+            return $response->successful() || $response->status() === 206;
+        } catch (\Throwable $e) {
+            return false;
         }
     }
 

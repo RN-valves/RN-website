@@ -58,6 +58,11 @@ class ProductImagesController extends Controller
             }
             $data['created_by'] = auth()->user()->name;
             $data['product_id'] = $product->id;
+
+            if (!$this->remoteImageExists($data['image'])) {
+                return back()->with('error', 'Image URL is not reachable. Upload the photo to CDN first, then save.');
+            }
+
             ProductImage::updateOrCreate(
                 [
                     'sku_code' => $data['sku_code'],
@@ -100,6 +105,11 @@ class ProductImagesController extends Controller
                 return back()->with('error', 'data not found!!');
             }
             $data['product_id'] = $product->id;
+
+            if (!$this->remoteImageExists($data['image'])) {
+                return back()->with('error', 'Image URL is not reachable. Upload the photo to CDN first, then save.');
+            }
+
             ProductImage::whereId($productImage->id)->update($data);
             return redirect(route('productImages.index'))->with('success', 'Product Images updated successfully.');
         }catch(\Exception $e){
@@ -158,6 +168,31 @@ class ProductImagesController extends Controller
                 'user_id' => optional(auth()->user())->id,
             ]);
             return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Confirm the image URL is reachable before creating/updating a record.
+     */
+    protected function remoteImageExists(string $imageUrl): bool
+    {
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(8)
+                ->withOptions(['allow_redirects' => true, 'verify' => false])
+                ->head($imageUrl);
+
+            if ($response->successful()) {
+                return true;
+            }
+
+            $response = \Illuminate\Support\Facades\Http::timeout(8)
+                ->withOptions(['allow_redirects' => true, 'verify' => false])
+                ->withHeaders(['Range' => 'bytes=0-0'])
+                ->get($imageUrl);
+
+            return $response->successful() || $response->status() === 206;
+        } catch (\Throwable $e) {
+            return false;
         }
     }
 }

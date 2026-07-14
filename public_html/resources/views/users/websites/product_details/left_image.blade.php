@@ -28,11 +28,13 @@
             <!--thumb loop li repeat--->
             @if($getSingleProduct['productImages']->count()>0)
             @foreach($getSingleProduct['productImages']??'' as $productImage)
+            @if(!empty($productImage['image']))
             <li>
-               <a href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '{{ url($productImage['image']??'') }}',largeimage: '{{ url($productImage['image']??'') }}'}">
-               <img src="{{ url($productImage['image']??'') }}"  class="thmbs" alt="{{ $getSingleProduct['title']??'' }}">
+               <a href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '{{ url($productImage['image']) }}',largeimage: '{{ url($productImage['image']) }}'}">
+               <img src="{{ url($productImage['image']) }}"  class="thmbs" alt="{{ $getSingleProduct['title']??'' }}" onerror="this.closest('li')?.remove()">
                </a>
             </li>
+            @endif
             @endforeach
             @endif
             <!--thumb loop--->
@@ -49,11 +51,13 @@
       <!---img Default---->
       @if($getSingleProduct['productImages']->count()>0)
       @foreach($getSingleProduct['productImages']??'' as $productImage)
+      @if(!empty($productImage['image']))
       <!---img loop---->
       <div class="pro_img_bxxbx">
-         <img src="{{ url($productImage['image']??'') }}" alt="{{ $getSingleProduct['title']??'' }}"> 
+         <img src="{{ url($productImage['image']) }}" alt="{{ $getSingleProduct['title']??'' }}" onerror="this.closest('.pro_img_bxxbx')?.remove()"> 
       </div>
       <!---img loop---->
+      @endif
       @endforeach
       @endif
    </div>
