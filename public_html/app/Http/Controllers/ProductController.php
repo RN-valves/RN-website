@@ -576,6 +576,7 @@ class ProductController extends Controller
         ini_set('memory_limit', '512M');
         set_time_limit(300);
 
+        try {
             if($request->isMethod('post')){
                 $request->validate([
                     'import_file' => ['required','mimes:xlsx'],
@@ -585,15 +586,15 @@ class ProductController extends Controller
                     $originalName = $upload->getClientOriginalName();
                     $extension = $upload->getClientOriginalExtension();
 
-                    // Persist for background processing before moving the upload for audit history.
-                    $storedPath = $upload->store('temp');
-                    $absolutePath = Storage::path($storedPath);
+                    // Must use local disk — default FILESYSTEM_DISK may be s3 (no local paths).
+                    $storedPath = $upload->store('temp', 'local');
+                    $absolutePath = Storage::disk('local')->path($storedPath);
 
                     $randomName = str()->random(30);
                     $fileName = str($originalName, '-')->append($randomName)->slug().'.'.$extension;
                     $importPath = public_path('uploads/imports/');
-                    File::ensureDirectoryExists($importPath, 0775, true);
-                    File::copy($absolutePath, $importPath.$fileName);
+                    \Illuminate\Support\Facades\File::ensureDirectoryExists($importPath, 0775, true);
+                    \Illuminate\Support\Facades\File::copy($absolutePath, $importPath.$fileName);
 
                     ImportedFileLog::create([
                         'auth_id' => auth()->user()->id,
@@ -609,7 +610,7 @@ class ProductController extends Controller
                 }
                 return back()->with('error', 'Please choose an Excel file to upload.');
             }
-            
+
             if($request->export=="export"){
                 $brands = Brand::select('id','name')->get();
                 $categories = Subcategory::join('categories','categories.id','=','subcategories.category_id')
@@ -630,7 +631,7 @@ class ProductController extends Controller
                 ]);
                 return export_fast_excel($sheets, now().'_products.xlsx');
             }
-            
+
             if($request->update=="update"){
                 // Stream rows so ~7000 products do not exhaust memory / hit gateway timeouts.
                 $products = function () {
@@ -701,6 +702,14 @@ class ProductController extends Controller
 
             $imports = ImportedFileLog::where(['model_name'=>'product'])->get();
             return view('admin.products.import',compact('imports'));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Product import/export failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            return back()->with('error', 'Import/export failed: '.$e->getMessage());
+        }
     }
     public function import_products_qty(Request $request){
         try{
