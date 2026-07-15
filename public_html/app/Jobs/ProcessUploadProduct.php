@@ -3,12 +3,20 @@
 namespace App\Jobs;
 
 use App\Imports\ProductImport;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class ProcessUploadProduct
+class ProcessUploadProduct implements ShouldQueue
 {
-    use Dispatchable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $timeout = 900;
+
+    public int $tries = 1;
 
     public function __construct(public string $path)
     {
@@ -26,12 +34,13 @@ class ProcessUploadProduct
             }
 
             (new ProductImport)->import($this->path);
+            Log::info('Product Excel import finished', ['path' => $this->path]);
         } catch (\Throwable $e) {
             Log::error('Product Excel import failed', [
                 'path' => $this->path,
                 'message' => $e->getMessage(),
             ]);
-            // Do not rethrow afterResponse — response is already sent to the browser.
+            throw $e;
         }
     }
 }

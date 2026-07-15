@@ -572,9 +572,9 @@ class ProductController extends Controller
     }
 
     public function import_products(Request $request){
-        // Large Excel sheets (~7000 rows) exceed default PHP/nginx timeouts if handled inline.
+        // Keep request short — heavy Excel work is spawned outside PHP-FPM so nginx never waits.
         ini_set('memory_limit', '512M');
-        set_time_limit(300);
+        set_time_limit(60);
 
         try {
             if($request->isMethod('post')){
@@ -603,8 +603,8 @@ class ProductController extends Controller
                         'file_path' => 'uploads/imports/'.$fileName,
                     ]);
 
-                    // Finish the HTTP response first, then import — avoids nginx 504 on ~7000 rows.
-                    ProcessUploadProduct::dispatchAfterResponse($absolutePath);
+                    // Detached CLI process — returns in <1s; nginx will not 504.
+                    $this->spawnArtisanBackground('products:import-excel', [$absolutePath]);
 
                     return back()->with('success', 'File uploaded. Import is running in the background — large sheets (~7000 rows) may take a few minutes. Refresh the products list shortly.');
                 }
@@ -633,75 +633,37 @@ class ProductController extends Controller
             }
 
             if($request->update=="update"){
-                // Stream rows so ~7000 products do not exhaust memory / hit gateway timeouts.
-                $products = function () {
-                    $query = Product::join('product_attributes','product_attributes.product_id','=','products.id')
-                        ->join('subcategories','subcategories.id','=','products.subcategory_id')
-                        ->join('categories','categories.id','=','products.category_id')
-                        ->select([
-                            'categories.name as category',
-                            'subcategories.name as subcategory',
-                            'products.name',
-                            'products.content_id',
-                            'products.brand',
-                            'products.material',
-                            'products.color_name',
-                            'products.color_group_id',
-                            'products.packaging_group_id',
-                            'products.product_combo_id',
-                            'products.product_size_id',
-                            'products.article',
-                            'products.sku_code',
-                            'products.size',
-                            'products.hsn',
-                            'products.image',
-                            'products.in_mrp',
-                            'products.in_selling',
-                            'products.in_v1_mrp',
-                            'products.oth_mrp',
-                            'products.oth_selling',
-                            'products.oth_v1_mrp',
-                            'products.title',
-                            'products.keywords',
-                            'products.description',
-                            'products.search_keywords',
-                            'products.status',
-                            'products.is_visible_website',
-                            'products.new_arrival',
-                            'products.is_visible_api',
-                            'products.is_featured',
-                            'products.is_full_turn',
-                            'products.full_turn_code',
-                            'products.sale_type',
-                            'product_attributes.ctn_pcs',
-                            'product_attributes.mid_ctn_pcs',
-                            'product_attributes.inner_pcs',
-                            'product_attributes.stock_pcs',
-                            'product_attributes.only_product_wt_gm',
-                            'product_attributes.product_length',
-                            'product_attributes.product_breadth',
-                            'product_attributes.product_height',
-                            'product_attributes.product_lbh_weight_gm',
-                            'product_attributes.mid_ctn_lbh_weight_kg',
-                            'product_attributes.master_ctn_lbh_weight_kg',
-                            'product_attributes.residential_warranty',
-                            'product_attributes.commercial_warranty',
-                            'product_attributes.amazon_link',
-                            'product_attributes.flipkart_link',
-                            'product_attributes.short_description',
-                            'product_attributes.video_url',
-                        ]);
+                $output = storage_path('app/exports/products_update_template.xlsx');
+                $pending = $output.'.pending';
+                \Illuminate\Support\Facades\File::ensureDirectoryExists(dirname($output), 0775, true);
 
-                    foreach ($query->cursor() as $product) {
-                        yield $product;
+                // Serve a finished background export (never build 7000 rows inside nginx request).
+                if ($request->download == '1') {
+                    if (is_file($output) && !is_file($pending)) {
+                        return response()->download($output, now().'_products.xlsx');
                     }
-                };
+                    return back()->with('error', 'Update Template is not ready yet. Wait a bit and try Download Ready again.');
+                }
 
-                return export_fast_excel($products(), now().'_products.xlsx');
+                if (is_file($pending)) {
+                    return back()->with('success', 'Update Template is still being prepared. Wait 2–3 minutes, refresh this page, then click Download Ready.');
+                }
+
+                // Fresh export already on disk → download immediately
+                if (is_file($output) && filemtime($output) > (time() - 900) && !$request->boolean('rebuild')) {
+                    return response()->download($output, now().'_products.xlsx');
+                }
+
+                $this->spawnArtisanBackground('products:export-update-template', [$output]);
+
+                return back()->with('success', 'Preparing Update Template in the background (~7000 products). Refresh in 2–3 minutes and click Download Ready.');
             }
 
             $imports = ImportedFileLog::where(['model_name'=>'product'])->get();
-            return view('admin.products.import',compact('imports'));
+            $updateTemplatePath = storage_path('app/exports/products_update_template.xlsx');
+            $updateTemplatePending = is_file($updateTemplatePath.'.pending');
+            $updateTemplateReady = is_file($updateTemplatePath) && !$updateTemplatePending;
+            return view('admin.products.import', compact('imports', 'updateTemplateReady', 'updateTemplatePending'));
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Product import/export failed', [
                 'message' => $e->getMessage(),
@@ -710,6 +672,55 @@ class ProductController extends Controller
             ]);
             return back()->with('error', 'Import/export failed: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Run an Artisan command fully detached from PHP-FPM so nginx can respond immediately.
+     * Falls back to the database queue when shell exec is unavailable.
+     */
+    protected function spawnArtisanBackground(string $command, array $arguments = []): void
+    {
+        $php = (defined('PHP_BINARY') && PHP_BINARY) ? PHP_BINARY : 'php';
+        $artisan = base_path('artisan');
+        $args = collect($arguments)->map(fn ($arg) => escapeshellarg($arg))->implode(' ');
+        $log = storage_path('logs/artisan-bg.log');
+
+        \Illuminate\Support\Facades\Log::info('Spawning background artisan', [
+            'command' => $command,
+            'arguments' => $arguments,
+        ]);
+
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        $canExec = function_exists('exec') && !in_array('exec', $disabled, true)
+            && function_exists('popen') && !in_array('popen', $disabled, true);
+
+        if ($canExec) {
+            if (strncasecmp(PHP_OS, 'WIN', 3) === 0) {
+                $cmd = "start /B \"\" {$php} \"{$artisan}\" {$command} {$args} >> \"{$log}\" 2>&1";
+                pclose(popen($cmd, 'r'));
+                return;
+            }
+
+            $cmd = sprintf(
+                'nohup %s %s %s %s >> %s 2>&1 < /dev/null &',
+                escapeshellarg($php),
+                escapeshellarg($artisan),
+                $command,
+                $args,
+                escapeshellarg($log)
+            );
+            exec($cmd);
+            return;
+        }
+
+        // Fallback when exec is disabled: queue job (requires `php artisan queue:work`).
+        if ($command === 'products:import-excel' && !empty($arguments[0])) {
+            ProcessUploadProduct::dispatch($arguments[0]);
+            \Illuminate\Support\Facades\Log::warning('exec disabled — queued ProcessUploadProduct instead');
+            return;
+        }
+
+        throw new \RuntimeException('Unable to start background process (exec disabled and no queue fallback for this command).');
     }
     public function import_products_qty(Request $request){
         try{
