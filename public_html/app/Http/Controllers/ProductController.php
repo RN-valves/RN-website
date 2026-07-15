@@ -26,8 +26,10 @@ use App\Http\Requests\{
 use App\Imports\ProductImport;
 use App\Imports\ProductQuantityImport;
 use App\Exports\ProductExport;
+use App\Jobs\ProcessUploadProduct;
 use Rap2hpoutre\FastExcel\SheetCollection;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -570,25 +572,42 @@ class ProductController extends Controller
     }
 
     public function import_products(Request $request){
-        // try{
+        // Large Excel sheets (~7000 rows) exceed default PHP/nginx timeouts if handled inline.
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
+
             if($request->isMethod('post')){
                 $request->validate([
                     'import_file' => ['required','mimes:xlsx'],
                 ]);
                 if($request->hasFile('import_file')){
-                    // dd($request->all());
-                    // try{
-                        //dd('kl');
-                        $import = new ProductImport;
-                        $import->import($request->file('import_file'));
-                    // }catch(\Maatwebsite\Excel\Validators\ValidationException $e){
-                    //     $failures = $e->failures();
-                    //     return back()->with('failures', $failures);
-                    // }
+                    $upload = $request->file('import_file');
+                    $originalName = $upload->getClientOriginalName();
+                    $extension = $upload->getClientOriginalExtension();
+
+                    // Persist for background processing before moving the upload for audit history.
+                    $storedPath = $upload->store('temp');
+                    $absolutePath = Storage::path($storedPath);
+
+                    $randomName = str()->random(30);
+                    $fileName = str($originalName, '-')->append($randomName)->slug().'.'.$extension;
+                    $importPath = public_path('uploads/imports/');
+                    File::ensureDirectoryExists($importPath, 0775, true);
+                    File::copy($absolutePath, $importPath.$fileName);
+
+                    ImportedFileLog::create([
+                        'auth_id' => auth()->user()->id,
+                        'model_name' => 'product',
+                        'file_name' => $originalName,
+                        'file_path' => 'uploads/imports/'.$fileName,
+                    ]);
+
+                    // Finish the HTTP response first, then import — avoids nginx 504 on ~7000 rows.
+                    ProcessUploadProduct::dispatchAfterResponse($absolutePath);
+
+                    return back()->with('success', 'File uploaded. Import is running in the background — large sheets (~7000 rows) may take a few minutes. Refresh the products list shortly.');
                 }
-                //upload history for public path
-                common_import_store($request, 'import_file', 'product');
-                return back()->with('success', 'file uploaded successfully');
+                return back()->with('error', 'Please choose an Excel file to upload.');
             }
             
             if($request->export=="export"){
@@ -613,20 +632,75 @@ class ProductController extends Controller
             }
             
             if($request->update=="update"){
-               $products = Product::join('product_attributes','product_attributes.product_id','=','products.id')
-                    ->join('subcategories','subcategories.id','=','products.subcategory_id')
-                    ->join('categories','categories.id','=','products.category_id')
-                    ->select(['categories.name as category','subcategories.name as subcategory','products.name','products.content_id','products.brand','products.material','products.color_name','products.name','products.color_group_id','products.packaging_group_id','products.product_combo_id','products.product_size_id','products.article','products.sku_code','products.size','products.hsn','products.image','products.in_mrp','products.in_selling','products.in_v1_mrp','products.oth_mrp','products.oth_selling','products.oth_v1_mrp','products.title','products.keywords','products.description','products.search_keywords','products.status','products.is_visible_website','products.new_arrival','products.is_visible_api','products.is_featured','products.is_full_turn','products.full_turn_code','products.sale_type','product_attributes.ctn_pcs','product_attributes.mid_ctn_pcs','product_attributes.inner_pcs','product_attributes.stock_pcs','product_attributes.only_product_wt_gm','product_attributes.product_length','product_attributes.product_breadth','product_attributes.product_height','product_attributes.product_lbh_weight_gm','product_attributes.mid_ctn_lbh_weight_kg','product_attributes.master_ctn_lbh_weight_kg','product_attributes.residential_warranty','product_attributes.commercial_warranty','product_attributes.amazon_link','product_attributes.flipkart_link','product_attributes.short_description','product_attributes.video_url'])
-                    ->get();
-                return export_fast_excel($products, now().'_products.xlsx');
-                //return (new ProductExport)->download(now().'_products.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+                // Stream rows so ~7000 products do not exhaust memory / hit gateway timeouts.
+                $products = function () {
+                    $query = Product::join('product_attributes','product_attributes.product_id','=','products.id')
+                        ->join('subcategories','subcategories.id','=','products.subcategory_id')
+                        ->join('categories','categories.id','=','products.category_id')
+                        ->select([
+                            'categories.name as category',
+                            'subcategories.name as subcategory',
+                            'products.name',
+                            'products.content_id',
+                            'products.brand',
+                            'products.material',
+                            'products.color_name',
+                            'products.color_group_id',
+                            'products.packaging_group_id',
+                            'products.product_combo_id',
+                            'products.product_size_id',
+                            'products.article',
+                            'products.sku_code',
+                            'products.size',
+                            'products.hsn',
+                            'products.image',
+                            'products.in_mrp',
+                            'products.in_selling',
+                            'products.in_v1_mrp',
+                            'products.oth_mrp',
+                            'products.oth_selling',
+                            'products.oth_v1_mrp',
+                            'products.title',
+                            'products.keywords',
+                            'products.description',
+                            'products.search_keywords',
+                            'products.status',
+                            'products.is_visible_website',
+                            'products.new_arrival',
+                            'products.is_visible_api',
+                            'products.is_featured',
+                            'products.is_full_turn',
+                            'products.full_turn_code',
+                            'products.sale_type',
+                            'product_attributes.ctn_pcs',
+                            'product_attributes.mid_ctn_pcs',
+                            'product_attributes.inner_pcs',
+                            'product_attributes.stock_pcs',
+                            'product_attributes.only_product_wt_gm',
+                            'product_attributes.product_length',
+                            'product_attributes.product_breadth',
+                            'product_attributes.product_height',
+                            'product_attributes.product_lbh_weight_gm',
+                            'product_attributes.mid_ctn_lbh_weight_kg',
+                            'product_attributes.master_ctn_lbh_weight_kg',
+                            'product_attributes.residential_warranty',
+                            'product_attributes.commercial_warranty',
+                            'product_attributes.amazon_link',
+                            'product_attributes.flipkart_link',
+                            'product_attributes.short_description',
+                            'product_attributes.video_url',
+                        ]);
+
+                    foreach ($query->cursor() as $product) {
+                        yield $product;
+                    }
+                };
+
+                return export_fast_excel($products(), now().'_products.xlsx');
             }
-            
+
             $imports = ImportedFileLog::where(['model_name'=>'product'])->get();
             return view('admin.products.import',compact('imports'));
-        // }catch(\Exception $e){
-        //     return back()->with('error', $e->getMessage());
-        // }
     }
     public function import_products_qty(Request $request){
         try{
