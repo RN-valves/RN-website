@@ -10,6 +10,7 @@
     src: url('../fonts/NeoSansStd-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -17,6 +18,7 @@
     src: url('../fonts/NeoSansStd-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -24,6 +26,7 @@
     src: url('../fonts/NeoSansStd-Bold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
@@ -31,6 +34,7 @@
     src: url('../fonts/NeoSansStd-Italic.woff2') format('woff2');
     font-weight: 400;
     font-style: italic;
+    font-display: swap;
 }
 
 
@@ -2912,8 +2916,8 @@ header .right-content {
 }
 
 header .logo-area {
-    width: 10%;
-    min-width: 160px;
+    width: 14%;
+    min-width: 200px;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -9360,7 +9364,7 @@ h6.main_hdfng {
 }
 
 .web_logo {
-    max-height: 113px;
+    max-height: 110px;
     margin-top: -42px;
     margin-left: 0px;
 }
@@ -9590,12 +9594,12 @@ h6.main_hdfng {
     }
 
     .web_logo {
-        max-height: 110px;
-        /* margin-top: 0; */
+        max-height: 95px;
+        margin-top: -45px;
         margin-left: 0;
         z-index: 101;
         position: absolute;
-        top: 0px;
+        top: 10px;
         left: 8px;
     }
 

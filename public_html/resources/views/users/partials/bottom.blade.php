@@ -2,7 +2,6 @@
    $url = url()->full(); 
    $types = App\Models\Enquiry::enquiryTypes();
 ?>
-<link rel="stylesheet" href="{{ url('users/assets/css/custom.css?111') }}" type="text/css">
 
 @if (request()->routeIs('register') || request()->routeIs('cart')  || request()->routeIs('CartCheckout') || request()->routeIs('login') || request()->routeIs('direct_payment'))
 @else
@@ -14,28 +13,28 @@
       <div class="row">
          <div class="col-md-3 col-sm-6 col-6">
             <div class="ctainformn">
-               <img src="{{asset('icons/rn1.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets">                               
+               <img src="{{asset('icons/rn1.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets" loading="lazy" width="64" height="64">                               
                <a href="{{route('register')}}" class="ctatexts">Dealer Locator </a>
                <p>Become an RN Valves & Faucets Dealer – Where Quality and Reliability Flow Together.</p>
             </div>
          </div>
          <div class="col-md-3 col-sm-6 col-6">
             <div class="ctainformn nobdr">
-               <img src="{{asset('icons/rn4.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets">                               
+               <img src="{{asset('icons/rn4.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets" loading="lazy" width="64" height="64">                               
                <a href="javascript:void();" class="ctatexts actn_enquiry">Talk to an Expert</a>
                <p>Need Expert Advice? Talk to an RN Valves & Faucets Specialist Today!</p>
             </div>
          </div>
          <div class="col-md-3 col-sm-6 col-6">
             <div class="ctainformn">
-               <img src="{{asset('icons/rn3.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets">                               
+               <img src="{{asset('icons/rn3.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets" loading="lazy" width="64" height="64">                               
                <a href="{{route('catalogue')}}" class="ctatexts">Download Catalogue</a>
                <p>Explore Our Products – Download the RN Valves & Faucets Catalogue Today!</p>
             </div>
          </div>
          <div class="col-md-3 col-sm-6 col-6">
             <div class="ctainformn nobdr">
-               <img src="{{asset('icons/rn2.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets">                               
+               <img src="{{asset('icons/rn2.png')}}" class="ctaicon" alt="RN Valves & Faucets" title="RN Valves & Faucets" loading="lazy" width="64" height="64">                               
                <a href="{{route('contactUs')}}" class="ctatexts">Customer Service Request</a>
                <p>Your Satisfaction, Our Priority – Contact RN Valves & Faucets Customer Service Today!</p>
             </div>
@@ -92,7 +91,7 @@
                </div>
                <div style="font-size: 13px; color: #ffffff; margin-top:30px;margin-bottom:10px;">Payment Accept :</div>
                <a href="{{ route('direct_payment') }}">
-               <img src="{{url('users/images/payments.png')}}" alt="RN Valves & Faucets" title="RN Valves & Faucets" style="height: 23px; margin-bottom: 30px;">
+               <img src="{{url('users/images/payments.png')}}" alt="RN Valves & Faucets" title="RN Valves & Faucets" style="height: 23px; margin-bottom: 30px;" loading="lazy" width="200" height="23">
                </a>
             </div>
             <div class="col-lg-3 col-md-6 hide_767">
@@ -132,13 +131,13 @@
                   <div style="margin-top: 30px;">
                      <div style="font-size: 13px; color: #ffffff; margin-bottom:15px;">Available on :</div>
                      <a target="_blank" href="https://play.google.com/store/apps/details?id=com.basiq.rnvalves&hl=en-IN">
-                     <img src="{{ url('users/images/google_play.png') }}" alt="RN Valves & Faucets" title="RN Valves & Faucets" class="app_iconnn">
+                     <img src="{{ url('users/images/google_play.png') }}" alt="RN Valves & Faucets" title="RN Valves & Faucets" class="app_iconnn" loading="lazy" width="120" height="36">
                      </a>
                      <a target="_blank" href="https://apps.apple.com/us/app/rn-valves/id6480268880">
-                     <img src="{{ url('users/images/apple_store.png') }}" alt="RN Valves & Faucets" title="RN Valves & Faucets" class="app_iconnn">
+                     <img src="{{ url('users/images/apple_store.png') }}" alt="RN Valves & Faucets" title="RN Valves & Faucets" class="app_iconnn" loading="lazy" width="120" height="36">
                      </a>
                   </div>
-                  <img src="{{asset('icons/rn_white_logo_blue.png')}}" alt="RN Valves & Faucets" title="RN Valves & Faucets" class="ftrbglogo">
+                  <img src="{{asset('icons/rn_white_logo_blue.png')}}" alt="RN Valves & Faucets" title="RN Valves & Faucets" class="ftrbglogo" loading="lazy" width="120" height="40">
                </div>
             </div>
          </div>
@@ -249,7 +248,7 @@
    </style>
    <a href="https://api.whatsapp.com/send?phone=91{{frontPage()->whatsapp??''}}&amp;text=Hello, I am a visitor from your website and would like to chat with you." target="_blank" class="call_fixed_btn"><i class="fab fa-whatsapp"></i></a>
 <a href="tel:{{frontPage()->mobile??''}}" class="phone-icon">
-    <img src="{{ asset('icons/phone-icon.png') }}" alt="RN Valves & Faucets" title="RN Valves & Faucets" alt="Phone Icon">
+    <img src="{{ asset('icons/phone-icon.png') }}" alt="Phone Icon" title="RN Valves & Faucets" loading="lazy" width="50" height="50">
 </a>
 <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -301,9 +300,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
 
-<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-<script src="https://www.carmela24.com/asreffect.js"></script>
-<script>jQuery('#carmela247').asreffect({color: '#0F0F0F',canvasHeight: 15});</script>
+{{-- jQuery UI and Carmela deferred so they don't block rendering --}}
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js" defer></script>
+<script src="https://www.carmela24.com/asreffect.js" defer></script>
+<script>document.addEventListener('DOMContentLoaded', function(){ if(typeof jQuery !== 'undefined' && jQuery('#carmela247').length){ jQuery('#carmela247').asreffect({color: '#0F0F0F',canvasHeight: 15}); } });</script>
 <style>
    #carmela247{overflow: visible !important;}
    .fa.fa-twitter{

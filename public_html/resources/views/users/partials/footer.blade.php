@@ -1,55 +1,62 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+@php $isProductDetail = request()->routeIs('productList.view'); @endphp
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js" defer></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" defer></script>
 
-<script type="text/javascript" src="{{url('users/assets/js/jquery.meanmenu.min.js')}}"></script>
-<script type="text/javascript" src="{{url('users/assets/js/wow.min.js')}}"></script>
+<script type="text/javascript" src="{{url('users/assets/js/jquery.meanmenu.min.js')}}" defer></script>
 
-<script src="{{url('users/assets/js/slick.min.js')}}"></script>
+@if($isProductDetail)
+<script src="{{url('users/assets/js/slick.min.js')}}" defer></script>
+<script src="{{url('users/assets/js/imagesloaded.pkgd.min.js')}}" defer></script>
+@endif
 
-<script type="text/javascript" src="{{url('users/assets/js/mains.js')}}"></script>
-<script src="{{url('users/assets/js/imagesloaded.pkgd.min.js')}}"></script>
-<script type="text/javascript" src="{{url('users/rnsldr/jquery.asr.slider.js')}}"></script>
-
-<script type="text/javascript" src="{{ url('users/assets/js/custom.js') }}"></script>
-
-<script type="text/javascript" src="{{ url('admin/assets/js/toastr.min.js') }}"></script>
+<script type="text/javascript" src="{{url('users/assets/js/mains.js')}}" defer></script>
+<script type="text/javascript" src="{{ url('users/assets/js/custom.js') }}" defer></script>
+<script type="text/javascript" src="{{ url('admin/assets/js/toastr.min.js') }}" defer></script>
 
 {{-- ajax form submit alert popup  --}}
-<script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js" defer></script>
 {{-- ajax form submit alert popup  --}}
 
 
-<!--Start of Tawk.to Script-->
+<!--Start of Tawk.to Script: deferred until after page load-->
 <script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/672b32004304e3196addcfe7/1ic0bmlc9';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
+window.addEventListener('load', function() {
+   setTimeout(function() {
+      var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+      var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+      s1.async=true;
+      s1.src='https://embed.tawk.to/672b32004304e3196addcfe7/1ic0bmlc9';
+      s1.charset='UTF-8';
+      s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1,s0);
+   }, 4000);
+});
 </script>
 <!--End of Tawk.to Script-->
 
 @if(Session::has('success'))
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+   if (typeof toastr === 'undefined') return;
    toastr.options = {
      "closeButton":true,
      "progressBar": true,
    }
    toastr.success("{{Session::get('success')}}");
+});
 </script>
 @endif
 @if(Session::has('error'))
 <script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+   if (typeof toastr === 'undefined') return;
    toastr.options = {
      "closeButton":true,
      "progressBar": true,
    }
    toastr.error("{{Session::get('error')}}");
+});
 </script>
 @endif
 
@@ -93,14 +100,21 @@ s0.parentNode.insertBefore(s1,s0);
 </script>
 
 <script type="text/javascript">
-   $('#popup_form').submit(function(event) {
-       event.preventDefault();
-       grecaptcha.ready(function() {
-           grecaptcha.execute("{{ env('GOOGLE_RECAPTCHA_KEY') }}", {action: 'subscribe_newsletter'}).then(function(token) {
-               $('#popup_form').prepend('<input type="text" name="g-recaptcha-response" value="' + token + '">');
-               $('#popup_form').unbind('submit').submit();
-           });;
-       });
+   $(document).ready(function(){
+      $('#popup_form').on('submit', function(event) {
+         event.preventDefault();
+         var form = this;
+         function submitWithCaptcha() {
+            if (typeof grecaptcha === 'undefined') return;
+            grecaptcha.ready(function() {
+               grecaptcha.execute("{{ env('GOOGLE_RECAPTCHA_KEY') }}", {action: 'subscribe_newsletter'}).then(function(token) {
+                  $(form).prepend('<input type="hidden" name="g-recaptcha-response" value="' + token + '">');
+                  form.submit();
+               });
+            });
+         }
+         submitWithCaptcha();
+      });
    });
 </script>
 <script type="text/javascript">
@@ -165,58 +179,27 @@ $(document).ready(function () {
 </script>
 {{-- New website scripts end --}}
 
-
-<script type="text/javascript"> 
-jQuery(function(){
-    jQuery("#slider").nivoSlider({
-        effect:"fade",
-        slices:15,
-        boxCols:8,
-        boxRows:4,
-        animSpeed:500,
-        pauseTime:3000,
-        startSlide:0,
-        directionNav:true,
-        directionNavHide:true,
-        controlNav:true,
-        keyboardNav:true,
-        pauseOnHover:true,
-        manualAdvance:true
-    });
-});
-</script> 
- <script type="text/javascript">
-   window.onload = function() {
-    setTimeout(function(){
-       $('#onloadpopup').modal('show');
-    },2000);
-};
-</script>
-<style type="text/css">
-    .ajax-load {
-        background: #e1e1e1;
-        padding: 10px 0px;
-        width: 100%;
-    }
-    
-</style>
+@if($isProductDetail)
 <!----asr--->
-<script src="{{url('users/asr_zoom/jquery.jqzoom.js')}}" type="text/javascript"></script>
+<script src="{{url('users/asr_zoom/jquery.jqzoom.js')}}" type="text/javascript" defer></script>
 
 <script type="text/javascript">
-$(document).ready(function() {
-  $('.jqzoom').jqzoom({
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof jQuery !== 'undefined' && jQuery('.jqzoom').length) {
+    jQuery('.jqzoom').jqzoom({
          zoomType: 'innerzoom',
             preloadImages: false,
             alwaysOn:false,
             title: false,
              showEffect: 'show'
-        });  
+        });
+  }
 });
 </script>
-<!----asr---> 
+<!----asr--->
+@endif
 
-<!-- sticky script -->  
+<!-- sticky script -->
 <script>
     $(document).ready(function() {
   

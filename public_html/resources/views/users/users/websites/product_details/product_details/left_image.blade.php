@@ -11,7 +11,7 @@
       <!--Show slider start Image--->
       <div class="div_thumb" >
          <ul id="thumblist" class="prod_gallery" >
-            <!---set default img--->
+            <!--- Main image thumbnail (keep — do not remove) --->
             <li>
                <a class="zoomThumbActive" href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '{{ url($getSingleProduct['image']??'') }}',largeimage: '{{ url($getSingleProduct['image']??'') }}'}">
                <img src="{{ url($getSingleProduct['image']??'') }}" class="thmbs" alt="{{ $getSingleProduct['title']??'' }}">
@@ -24,11 +24,14 @@
                </a> 
             </li> 
             @endif
-            <!--set default img--->
-            <!--thumb loop li repeat--->
+            <!-- Extra gallery thumbs only — never repeat main image --->
             @if($getSingleProduct['productImages']->count()>0)
             @foreach($getSingleProduct['productImages']??'' as $productImage)
-            @if(!empty($productImage['image']))
+            @php
+               $mainImage = normalizeProductImageUrl($getSingleProduct['image'] ?? '');
+               $galleryImage = normalizeProductImageUrl($productImage['image'] ?? '');
+            @endphp
+            @if(!empty($productImage['image']) && $galleryImage !== '' && $galleryImage !== $mainImage)
             <li>
                <a href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '{{ url($productImage['image']) }}',largeimage: '{{ url($productImage['image']) }}'}">
                <img src="{{ url($productImage['image']) }}"  class="thmbs" alt="{{ $getSingleProduct['title']??'' }}" onerror="this.closest('li')?.remove()">
@@ -51,7 +54,11 @@
       <!---img Default---->
       @if($getSingleProduct['productImages']->count()>0)
       @foreach($getSingleProduct['productImages']??'' as $productImage)
-      @if(!empty($productImage['image']))
+      @php
+         $mainImage = normalizeProductImageUrl($getSingleProduct['image'] ?? '');
+         $galleryImage = normalizeProductImageUrl($productImage['image'] ?? '');
+      @endphp
+      @if(!empty($productImage['image']) && $galleryImage !== '' && $galleryImage !== $mainImage)
       <!---img loop---->
       <div class="pro_img_bxxbx">
          <img src="{{ url($productImage['image']) }}" alt="{{ $getSingleProduct['title']??'' }}" onerror="this.closest('.pro_img_bxxbx')?.remove()"> 

@@ -26,6 +26,11 @@ class ProductImagesImport implements
 use DefaultTrait;
 use Importable, SkipsErrors;
 
+    protected function normalizeImageUrl(?string $url): string
+    {
+        return normalizeProductImageUrl($url);
+    }
+
     /**
     * @param array $row
     *
@@ -46,6 +51,10 @@ use Importable, SkipsErrors;
             ->get()
             ->keyBy('sku_code');
 
+        $existingImages = ProductImage::whereIn('sku_code', $skuCodes)
+            ->get()
+            ->groupBy('sku_code');
+
         foreach ($rows as $row) {
             $skuCode = trim((string) ($row['sku_code'] ?? ''));
             $image = trim((string) ($row['image'] ?? ''));
@@ -54,20 +63,37 @@ use Importable, SkipsErrors;
             }
 
             $product = $productsBySku->get($skuCode);
-            if (!empty($product)) {
-                ProductImage::updateOrCreate(
-                    [
-                        'sku_code' => $skuCode,
-                        'image' => $image,
-                    ],
-                    [
-                        'image' => $image,
-                        'sku_code' => $skuCode,
-                        'product_id' => $product['id'],
-                        'created_by' => optional(auth()->user())->name ?? 'system',
-                    ],
-                );
+            if (empty($product)) {
+                continue;
             }
+
+            $normalizedImage = $this->normalizeImageUrl($image);
+            $mainImage = $this->normalizeImageUrl($product->image ?? '');
+
+            // Main product image is already shown on the product page — do not add it to gallery again.
+            if ($normalizedImage !== '' && $normalizedImage === $mainImage) {
+                continue;
+            }
+
+            $skuExisting = $existingImages->get($skuCode, collect());
+            $alreadyExists = $skuExisting->contains(
+                fn ($existing) => $this->normalizeImageUrl($existing->image) === $normalizedImage
+            );
+            if ($alreadyExists) {
+                continue;
+            }
+
+            $created = ProductImage::create([
+                'image' => $image,
+                'sku_code' => $skuCode,
+                'product_id' => $product->id,
+                'created_by' => optional(auth()->user())->name ?? 'system',
+            ]);
+
+            $existingImages->put(
+                $skuCode,
+                $skuExisting->push($created)
+            );
         }
     }
 

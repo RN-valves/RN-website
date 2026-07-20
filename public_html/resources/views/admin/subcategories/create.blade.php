@@ -63,6 +63,12 @@
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
          </div>
          <div class="col-md-3 form-group mt-3">
+            <x-input-label class="mb-1" for="display_order" :value="__('Display Order')" />
+            <input type="number" name="display_order" id="display_order" min="0" class="form-control shadow-none @error('display_order') is-invalid @enderror" placeholder="e.g. 1" value="{{ old('display_order', @$subcategory->display_order) }}">
+            <small class="text-muted">Lower number = shown first on website</small>
+            <x-input-error class="mt-2" :messages="$errors->get('display_order')" />
+         </div>
+         <div class="col-md-3 form-group mt-3">
             <x-input-label class="mb-1" for="is_visible_website" :value="__('Select Visible Web')" />
             <select class="form-control shadow-none @error('is_visible_website') is-invalid @enderror" name="is_visible_website" id="is_visible_website">
                <option value="">Select Visible Web</option>

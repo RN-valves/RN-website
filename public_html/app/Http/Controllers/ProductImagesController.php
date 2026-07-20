@@ -58,13 +58,24 @@ class ProductImagesController extends Controller
             }
             $data['created_by'] = auth()->user()->name;
             $data['product_id'] = $product->id;
-            ProductImage::updateOrCreate(
-                [
-                    'sku_code' => $data['sku_code'],
-                    'image' => $data['image'],
-                ],
-                $data,
-            );
+
+            // Do not add the main product image again into the gallery.
+            if (rtrim(strtolower(trim((string) $data['image'])), '/')
+                === rtrim(strtolower(trim((string) ($product->image ?? ''))), '/')) {
+                return back()->with('error', 'This image is already the main product image. Add a different gallery image.');
+            }
+
+            $exists = ProductImage::where('sku_code', $data['sku_code'])
+                ->get()
+                ->contains(function ($row) use ($data) {
+                    return rtrim(strtolower(trim((string) $row->image)), '/')
+                        === rtrim(strtolower(trim((string) $data['image'])), '/');
+                });
+            if ($exists) {
+                return back()->with('success', 'Product image already exists — skipped duplicate.');
+            }
+
+            ProductImage::create($data);
             return back()->with('success', 'Product Images created successfully.');
         }catch(\Exception $e){
             return back()->with('error', $e->getMessage());

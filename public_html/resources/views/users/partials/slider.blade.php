@@ -19,17 +19,36 @@ $sliders = App\Models\Slider::where('status','Active')->limit(3)->get();
                display: none!important;
              }      
          }
+         /* Prevent CLS: reserve space for video container */
+         .rn_home_video {
+             position: relative;
+             width: 100%;
+             height: 0;
+             padding-top: 56.25%;
+             background: #000;
+             overflow: hidden;
+         }
+         .rn_home_video video {
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             object-fit: cover;
+         }
       </style>
       <div class="slider-wrapper theme-default">
          <!---video start ---->
-         <div class="rn_home_video" style="position: relative;">
+         <div class="rn_home_video">
             
-            <video autoplay muted playsinline class="vjo7o7-znMg" id="myVideo" width="100%">
-               <source src="https://rnvalves.media/Catalogue/bannerVideo1.mp4" type="video/mp4" />
+            {{-- Desktop video: poster + lazy load to improve LCP --}}
+            <video muted playsinline class="vjo7o7-znMg" id="myVideo" width="1920" height="1080" preload="none" poster="https://rnvalves.media/Catalogue/Banner/5.jpg">
+               <source data-src="https://rnvalves.media/Catalogue/bannerVideo1.mp4" type="video/mp4" />
             </video>
             
-            <video autoplay muted preload="none" playsinline id="mobileVideo">
-               <source src="https://rnvalves.media/Catalogue/bannerVideo.mp4" type="video/mp4">
+            {{-- Mobile video: poster + lazy load --}}
+            <video muted preload="none" playsinline id="mobileVideo" width="1080" height="1920" poster="https://rnvalves.media/Catalogue/Banner/5.jpg">
+               <source id="mobileVideoSrc" data-src="" type="video/mp4">
             </video>
 
             {{-- Slider Controls (Next / Prev) --}}
@@ -159,14 +178,41 @@ $sliders = App\Models\Slider::where('status','Active')->limit(3)->get();
                      "https://rnvalves.media/Catalogue/bannerVideo1.mp4",
                      "https://rnvalves.media/Catalogue/bannerVideo2.mp4",
                      "https://rnvalves.media/Catalogue/bannerVideo3.mp4",
-                     // "https://rnvalves.media/Catalogue/bannerVideo4.mp4",
                   ];
                   const mobileVideos = [
                      "https://rnvalves.media/Catalogue/bannerVideo.mp4",
                      "https://rnvalves.media/Catalogue/bannerVideo2.mp4",
                      "https://rnvalves.media/Catalogue/bannerVideo3.mp4",
-                     // "https://rnvalves.media/Catalogue/bannerVideo4.mp4",
                   ];
+
+                  function setVideoSource(videoEl, url) {
+                     const source = videoEl.querySelector("source");
+                     if (!source) return;
+                     source.src = url;
+                     source.removeAttribute("data-src");
+                     videoEl.load();
+                  }
+
+                  function startHeroVideos() {
+                     const isMobileInit = window.innerWidth <= 768;
+                     if (isMobileInit) {
+                        setVideoSource(mobileVideo, mobileVideos[0]);
+                     } else {
+                        setVideoSource(myVideo, desktopVideos[0]);
+                     }
+                     myVideo.play().catch(function(){});
+                     mobileVideo.play().catch(function(){});
+                  }
+
+                  const heroObserver = new IntersectionObserver(function(entries) {
+                     entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                           startHeroVideos();
+                           heroObserver.disconnect();
+                        }
+                     });
+                  }, { rootMargin: "200px 0px" });
+                  heroObserver.observe(document.querySelector(".rn_home_video"));
                   
                   const textContent = [
                      {
@@ -198,14 +244,10 @@ $sliders = App\Models\Slider::where('status','Active')->limit(3)->get();
                      const inactiveVideo = isMobile ? myVideo : mobileVideo;
 
                      // Update Desktop Source
-                     const desktopSrc = myVideo.querySelector("source");
-                     desktopSrc.src = desktopVideos[currentVideoIndex];
-                     myVideo.load();
+                     setVideoSource(myVideo, desktopVideos[currentVideoIndex]);
                      
                      // Update Mobile Source
-                     const mobileSrc = mobileVideo.querySelector("source");
-                     mobileSrc.src = mobileVideos[currentVideoIndex];
-                     mobileVideo.load();
+                     setVideoSource(mobileVideo, mobileVideos[currentVideoIndex]);
 
                      // Apply mute state based on global flag and visibility
                      myVideo.muted = true; // Always mute desktop by default during change

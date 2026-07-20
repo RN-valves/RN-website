@@ -26,6 +26,7 @@ class Subcategory extends Model
         return self::where('category_id','=',$category_id)
             ->where('subcategories.status', '=', 'Active')
             ->where('subcategories.is_visible_website', '=', 1)
+            ->orderBy('display_order', 'asc')
             ->get();
     }
 

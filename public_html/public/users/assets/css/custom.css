@@ -4466,7 +4466,7 @@
     position: relative;
     width: 100%;
     height: 0;
-    padding-top: 59%;
+    padding-top: 56.25%;
     overflow: hidden;
 }
 
@@ -4474,19 +4474,21 @@
     position: absolute;
     width: 100%;
     border-radius: 0px !important;
-    top: -50px;
+    top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% + 100px);
+    height: 100%;
+    object-fit: cover;
 }
 .rn_home_video video{
     position: absolute;
     width: 100%;
     border-radius: 0px !important;
-    top: -50px;
+    top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% + 100px);
+    height: 100%;
+    object-fit: cover;
 }
 
 .rn_home_video .overlay {
@@ -4645,7 +4647,7 @@
     }
 
     .rn_home_video {
-        padding-top: 82%;
+        padding-top: 75%;
         height: auto;
         overflow: hidden;
     }
@@ -4664,11 +4666,12 @@
     }
   .rn_home_video video{
         position: absolute;
-        top: -80px;
+        top: 0;
         margin: 0px auto;
         width: 100%;
-        height: calc(100% + 110px);
+        height: 100%;
         border-radius: 0px !important;
+        object-fit: cover;
     }
 
     .rn_home_video .overlay img {

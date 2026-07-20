@@ -21,7 +21,7 @@ use App\Http\Controllers\Api\V1\{
 |
 */
 Route::post('login', [AuthController::class, 'login']);
-Route::group(['middleware' => ['auth:api'], 'prefix'=>'v1'], function () {
+Route::group(['middleware' => ['auth:api'], 'prefix'=>'v1', 'as'=>'api.'], function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('subcategories', SubcategoryController::class);
     Route::resource('products', ProductsController::class);

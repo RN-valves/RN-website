@@ -97,9 +97,10 @@ class SubcategoryController extends Controller
             'is_visible_website' => ['required','in:0,1'],
             'category_id' => ['required','exists:categories,id'],
             'pdf_catalogue' => ['nullable'],
+            'display_order' => ['nullable','integer','min:0'],
         ]);
         try{
-            $data = $request->only('name','title','keywords','description','image','is_visible_website','content_id','status','banner','icon','category_id','pdf_catalogue');
+            $data = $request->only('name','title','keywords','description','image','is_visible_website','content_id','status','banner','icon','category_id','pdf_catalogue','display_order');
             $data['image'] = $this->ImageResizer($request, 'image', 'uploads/catalogue/subcategories/',500,500)??null;
             $data['icon'] = $this->ImageResizer($request, 'icon', 'uploads/catalogue/subcategories/icons/',100,100)??null;
             $data['banner'] = $this->ImageResizer($request, 'banner', 'uploads/catalogue/subcategories/banners/',1900,400)??null;
@@ -168,9 +169,10 @@ class SubcategoryController extends Controller
             'is_visible_website' => ['required','in:0,1'],
             'category_id' => ['required','exists:categories,id'],
             'pdf_catalogue' => ['nullable'],
+            'display_order' => ['nullable','integer','min:0'],
         ]);
         try{
-            $data = $request->only('name','title','keywords','description','is_visible_website','content_id','status','category_id');
+            $data = $request->only('name','title','keywords','description','is_visible_website','content_id','status','category_id','display_order');
             $data['image'] = $this->updateSubcategoryFile($request, 'image', $subcategory, 'uploads/catalogue/subcategories/', 500, 500);
             $data['icon'] = $this->updateSubcategoryFile($request, 'icon', $subcategory, 'uploads/catalogue/subcategories/icons/', 100, 100);
             $data['banner'] = $this->updateSubcategoryFile($request, 'banner', $subcategory, 'uploads/catalogue/subcategories/banners/', 1900, 400);

@@ -60,7 +60,7 @@ $url = url()->current();
             <!--Logo Area Start-->
             <div class="logo-area">
                <a href="{{route('welcome')}}">
-               <img src="{{ url(frontPage()->logo??'') }}" class="web_logo" alt="RN Valves & Faucets - Logo">
+               <img src="{{ url(frontPage()->logo??'') }}" class="web_logo" alt="RN Valves & Faucets - Logo" fetchpriority="high">
                </a>
             </div>
             <!--// Logo Area End-->
@@ -123,7 +123,7 @@ $url = url()->current();
                                                 <div class="col-md-6 col-sm-6 col-6 plr8">
                                                    <a href="{{ route('productList.list', [$ACategory->url_key,$subCat]) }}">
                                                       <div class="catprlop">
-                                                         <img src="{{ url($subCat->image??'') }}" class="cathumb" alt="{{ $subCat->title??'' }}" title="{{ $subCat->title??'' }}">
+                                                         <img src="{{ url($subCat->image??'') }}" class="cathumb" alt="{{ $subCat->title??'' }}" title="{{ $subCat->title??'' }}" loading="lazy" width="80" height="80">
                                                          <div class="catxtxbx">
                                                             <div class="cat2name">{{ $subCat->name??'' }}</div>
                                                             <div class="greytxext">{{ $subCat->name??'' }}</div>
@@ -193,7 +193,7 @@ $url = url()->current();
                            <div class="dropdown-menu twobxss">
                               @foreach(ActiveCategories()??'' as $ACategory)
                               <a href="{{ route('productList', $ACategory) }}">
-                                 <img src="{{ url($ACategory->image??'') }}" alt="{{ $ACategory->name??'' }}" title="{{ $ACategory->name??'' }}" class="moblcthumb">
+                                 <img src="{{ url($ACategory->image??'') }}" alt="{{ $ACategory->name??'' }}" title="{{ $ACategory->name??'' }}" class="moblcthumb" loading="lazy" width="60" height="60">
                                  <div class="ctnsmxe">{{ $ACategory->name??'' }}</div>
                               </a>
                               @endforeach

@@ -17,9 +17,11 @@ use App\Models\{
     Product,
     Color,
     ProductAttribute,
+    ProductImage,
     Subcategory
 };
 use App\Traits\DefaultTrait;
+use App\Support\ProductImportProgress;
 
 class ProductImport implements
     ToCollection,
@@ -36,6 +38,35 @@ class ProductImport implements
 
     /** @var \Illuminate\Support\Collection|null */
     protected $colorsByName;
+
+    protected int $processedRows = 0;
+
+    public function __construct(
+        protected ?string $progressToken = null,
+        protected int $totalRows = 0,
+    ) {
+    }
+
+    protected function normalizeImageUrl(?string $url): string
+    {
+        return normalizeProductImageUrl($url);
+    }
+
+    protected function bumpProgress(int $count): void
+    {
+        if (!$this->progressToken) {
+            return;
+        }
+
+        $this->processedRows += $count;
+
+        ProductImportProgress::write([
+            'status' => 'running',
+            'processed' => $this->processedRows,
+            'total' => $this->totalRows,
+            'message' => 'Importing products…',
+        ], $this->progressToken);
+    }
 
     /**
      * Prefetch lookups once and reuse per chunk to keep ~7000-row Excel uploads
@@ -80,7 +111,11 @@ class ProductImport implements
             ? ProductAttribute::whereIn('product_id', $productIds)->get()->keyBy('product_id')
             : collect();
 
-        DB::transaction(function () use ($rows, $productsBySku, $attributesByProductId) {
+        $galleryImagesByProductId = $productIds
+            ? ProductImage::whereIn('product_id', $productIds)->get(['id', 'product_id', 'image'])->groupBy('product_id')
+            : collect();
+
+        DB::transaction(function () use ($rows, $productsBySku, $attributesByProductId, $galleryImagesByProductId) {
             foreach ($rows as $row) {
                 $skuCode = trim((string) ($row['sku_code'] ?? ''));
                 if ($skuCode === '') {
@@ -159,7 +194,33 @@ class ProductImport implements
                     $product = Product::create($productData);
                     $productsBySku->put($skuCode, $product);
                 } else {
-                    $product->fill($productData)->save();
+                    $product->fill($productData);
+                    if ($product->isDirty()) {
+                        $product->save();
+                    }
+                }
+
+                // Main product image must not also sit in the gallery (causes double display
+                // in big image + thumbnails after Update Template re-import).
+                $mainImageNormalized = $this->normalizeImageUrl($productData['image'] ?? '');
+                if ($mainImageNormalized !== '') {
+                    $galleryRows = $galleryImagesByProductId->get($product->id, collect());
+                    $remaining = collect();
+                    $deleteIds = [];
+
+                    foreach ($galleryRows as $galleryImage) {
+                        if ($this->normalizeImageUrl($galleryImage->image) === $mainImageNormalized) {
+                            $deleteIds[] = $galleryImage->id;
+                        } else {
+                            $remaining->push($galleryImage);
+                        }
+                    }
+
+                    if ($deleteIds !== []) {
+                        ProductImage::whereIn('id', $deleteIds)->delete();
+                    }
+
+                    $galleryImagesByProductId->put($product->id, $remaining);
                 }
 
                 $attributeData = [
@@ -186,13 +247,18 @@ class ProductImport implements
 
                 $attribute = $attributesByProductId->get($product->id);
                 if ($attribute) {
-                    $attribute->fill($attributeData)->save();
+                    $attribute->fill($attributeData);
+                    if ($attribute->isDirty()) {
+                        $attribute->save();
+                    }
                 } else {
                     $attribute = ProductAttribute::create($attributeData);
                     $attributesByProductId->put($product->id, $attribute);
                 }
             }
         });
+
+        $this->bumpProgress($rows->count());
     }
 
     public function chunkSize(): int

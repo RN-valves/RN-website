@@ -45,7 +45,7 @@
    <div class="container-fluid">
       <div class="rn_cate_listbox">
          <ul>
-            @foreach($category['subcategories']->sortByDesc('created_at')??'' as $subCategory)
+            @foreach($category['subcategories']->sortBy('display_order')??'' as $subCategory)
             @if($subCategory['is_visible_website']==1 && $subCategory['status']=='Active')
             <li>
                <a href="{{ route('productList.list', [$category['url_key'],$subCategory]) }}">

@@ -426,7 +426,7 @@ $newArriwals = App\Models\Product::where(['new_arrival'=>1, 'status'=>'Active', 
    .quantity .tc a,  .quantity .tc button { top: 1px !important;}
    .quantity input.input-text[type="number"] { height: 35px !important;}
    .header_shadow{box-shadow: none !important;}
-   @import url(https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+   /* FontAwesome is loaded in header.blade.php — no @import needed here */
    fieldset, label { margin: 0; padding: 0; }
    h1 { font-size: 1.5em; margin: 10px; }
    /****** Style Star Rating Widget *****/

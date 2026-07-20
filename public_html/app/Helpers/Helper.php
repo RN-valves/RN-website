@@ -65,6 +65,30 @@ function isiImage(){
     return "https://rnvalves.media/Catalogue/isi.jpg";
 }
 
+/**
+ * Compare product main vs gallery image URLs even when Excel / DB
+ * store the same file with slight URL differences (domain, slash, case).
+ */
+function normalizeProductImageUrl(?string $url): string
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return '';
+    }
+
+    $url = strtolower($url);
+    $url = preg_replace('/[?#].*$/', '', $url) ?? $url;
+    $url = str_replace('\\', '/', $url);
+    $url = rtrim($url, '/');
+
+    $path = parse_url($url, PHP_URL_PATH);
+    if (is_string($path) && $path !== '') {
+        return rtrim($path, '/');
+    }
+
+    return $url;
+}
+
 function ActiveCategories(){
     return Category::where(['status'=>'Active','is_visible_website'=>1])->orderBy('created_at','desc')->get();
 }

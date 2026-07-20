@@ -43,7 +43,7 @@ class Category extends Model
         return Subcategory::where('category_id','=',$category_id)
             ->where('subcategories.status', '=', 'Active')
             ->where('subcategories.is_visible_website', '=', 1)
-            ->orderBy('created_at','desc')
+            ->orderBy('display_order', 'asc')
             ->get();
     }
 
