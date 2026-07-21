@@ -522,9 +522,9 @@ public function place_order(Request $request){
             $order->name = $user->name;
             $order->mobile = $user->mobile;
             $order->email = $user->email;
-            $order->country = $user->country->name??'';
-            $order->state = $user->state->name??'';
-            $order->city = $user->city->name??'';
+            $order->country = $user->country?->name ?? '';
+            $order->state = $user->state?->name ?? '';
+            $order->city = $user->city?->name ?? '';
             $order->zipcode = $user->zipcode??'';
 
             if(!empty($user->pincode_id)){
@@ -533,7 +533,7 @@ public function place_order(Request $request){
         }
 
         $order->uuid = str()->uuid()->toString();
-        $order->booking_address =  $userAddress->address ?? ''. ' ' .$userAddress->state->name ?? ''. '-' .$userAddress->zipcode ?? '';
+        $order->booking_address = ($userAddress->address ?? '') . ' ' . ($userAddress->state?->name ?? '') . '-' . ($userAddress->zipcode ?? '');
         $order->note =  $data['note']??null;
         $order->discount_code =  $data['discount_code']??null;
         $order->discount_amount =  $discount_amount??0;
