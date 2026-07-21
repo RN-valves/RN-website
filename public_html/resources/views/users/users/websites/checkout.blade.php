@@ -11,7 +11,7 @@
 <!--Page-->
 <div class="cstm_page_section website-cart addressbxx">
    <div class="container-fluid">
-      <form action="#" method="post" id="SubmitForm">
+      <form action="{{ route('place_order') }}" method="post" id="SubmitForm">
       @csrf
       <div class="row">
          <div class="col-md-7 col-lg-8">
@@ -216,8 +216,16 @@ $('body').delegate('#SubmitForm', 'submit', function(e){
             window.location.href = data.redirect;
          }
       },
-      error : function(data){
-              
+      error : function(xhr){
+         var message = 'Unable to place order. Please refresh the page and try again.';
+         if (xhr.responseJSON && xhr.responseJSON.message) {
+            message = xhr.responseJSON.message;
+         } else if (xhr.status === 419) {
+            message = 'Your session expired. Please refresh the page and try again.';
+         } else if (xhr.status === 405) {
+            message = 'Something went wrong with checkout. Please refresh the page and try again.';
+         }
+         alert(message);
       }
    });
 });

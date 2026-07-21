@@ -468,7 +468,10 @@ public function place_order(Request $request){
         
         $userAddress = UserAddress::whereId(@$data['shipping_charge_id'])->first();
         if(empty($userAddress)){
-            return back()->with('error', 'Selected Shipping Address is incorrect');
+            $json['status'] = false;
+            $json['message'] = 'Selected Shipping Address is incorrect';
+            echo json_encode($json);
+            return;
         }
 
         // Calculate shipping charge based on payment method and subtotal
