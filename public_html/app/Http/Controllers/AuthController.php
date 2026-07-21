@@ -58,19 +58,25 @@ class AuthController extends Controller
             'mobile' => ['required','numeric','digits:10'],
             'zipcode' => ['required','exists:pincodes,code'],
             'address' => ['required','max:255'],
-            'user_id' => ['required','exists:users,id'],
             'type' => ['required',Rule::in(['Home','Office','Other'])],
         ]);
-        $data = $request->only('name','mobile','zipcode','address','user_id','type');
+
+        // Security: always use the authenticated user from session — never trust form input for user_id
+        $user = $request->user();
+        if(empty($user)){
+            return back()->with('error', 'Please login to save address');
+        }
+
+        $data = $request->only('name','mobile','zipcode','address','type');
         $pincode = Pincode::where('code',$data['zipcode'])->first();
         if(empty($pincode)){
             return back()->with('error', 'Pincode not match our records');
         }
-        $user = User::findOrFail($data['user_id']);
-        $userAddress = UserAddress::where('user_id',$user->id)->count();
-        if($userAddress == 0){
+
+        // On first address save, update user profile fields (but do NOT overwrite email)
+        $userAddressCount = UserAddress::where('user_id', $user->id)->count();
+        if($userAddressCount == 0){
             $user->name = $data['name'];
-            $user->email = $request->email;
             $user->zipcode = $data['zipcode'];
             $user->pincode_id = $pincode->id;
             $user->city_id = $pincode->city_id;
@@ -78,24 +84,20 @@ class AuthController extends Controller
             $user->country_id = $pincode->country_id;
             $user->address = $data['address'];
             $user->save();
-            Mail::to($user->email)->send(new RegisterMail($user));
-        }
-        if(empty($user)){
-            return back()->with('error', 'selected user/customer is invalid');
         }
         try{
             UserAddress::updateOrCreate(
                 [
+                    'user_id' => $user->id,
                     'mobile' => $data['mobile'],
                 ],
                 [
-                    'user_id' => $data['user_id'],
+                    'user_id' => $user->id,
                     'mobile' => $data['mobile'],
                     'name' => $data['name'],
                     'city_id' => $pincode->city_id,
                     'state_id' => $pincode->state_id,
                     'country_id' => $pincode->country_id,
-                    'name' => $data['name'],
                     'zipcode' => $data['zipcode'],
                     'address' => $data['address'],
                     'type' => $data['type'],
