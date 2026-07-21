@@ -528,7 +528,7 @@ public function place_order(Request $request){
             $order->zipcode = $user->zipcode??'';
 
             if(!empty($user->pincode_id)){
-                $order->pincode_id = $pincode->id??0;
+                $order->pincode_id = $user->pincode_id;
             }
         }
 
