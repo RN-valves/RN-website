@@ -34,7 +34,12 @@
                   <li></li>
                </ul>
                <a href="{{ route('productImages.import_productImages', ['export'=>'export']) }}" class="btn btn-sm btn-info border"> <i class="bx bx-cloud-download"></i> Add New Template</a>
-               <a href="{{ route('productImages.import_productImages', ['update'=>'update']) }}" class="btn btn-sm btn-warning border"> <i class="bx bx-download"></i> Update Template</a>
+               <a href="{{ route('productImages.import_productImages', ['update'=>'update', 'rebuild'=>1]) }}" class="btn btn-sm btn-warning border"> <i class="bx bx-download"></i> Update Template</a>
+               @if(!empty($updateTemplatePending ?? false))
+                  <div class="mt-2 text-warning small">Preparing Update Template... refresh in 2-3 minutes.</div>
+               @elseif(!empty($updateTemplateReady ?? false))
+                  <a href="{{ route('productImages.import_productImages', ['update'=>'update', 'download'=>1]) }}" class="btn btn-sm btn-success border mt-2"> <i class="bx bx-check"></i> Download Ready</a>
+               @endif
             </div>
          </div>
          <div class="col-lg-6 text-center text-sm-left">

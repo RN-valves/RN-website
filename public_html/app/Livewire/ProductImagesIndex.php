@@ -41,7 +41,9 @@ final class ProductImagesIndex extends PowerGridComponent
 
     public function datasource(): Builder
     {
-        return ProductImage::query()->orderByDesc('id');
+        return ProductImage::query()
+            ->with('product:id,article')
+            ->orderByDesc('id');
         /*return ProductImage::query()
             ->latest()
             ->when(
