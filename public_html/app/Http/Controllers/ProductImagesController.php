@@ -30,8 +30,7 @@ class ProductImagesController extends Controller
 
     public function index(){
         try{
-            $productImages = ProductImage::get();
-            return view('admin.product_images.index', compact('productImages'));
+            return view('admin.product_images.index');
         }catch(\Exception $e){
             return back()->with('error', $e->getMessage());
         }
@@ -158,32 +157,31 @@ class ProductImagesController extends Controller
             }
             
             if($request->update=="update"){
-                // Stream 16k+ rows using a generator/cursor — never loads all rows into memory
-                @ini_set('memory_limit', '1024M');
-                @set_time_limit(600);
+                // Full ~13k+ export via cursor stream (avoids loading all rows into memory).
+                // Takes ~5-10s; lift the default 60s web timeout.
+                @ini_set('memory_limit', '512M');
+                @set_time_limit(0);
 
-                $generator = function () {
-                    DB::table('product_images')
+                $rows = function () {
+                    $query = DB::table('product_images')
                         ->join('products', 'products.id', '=', 'product_images.product_id')
                         ->select('products.article', 'product_images.sku_code', 'product_images.image')
-                        ->orderBy('product_images.id')
-                        ->chunk(500, function ($rows) use (&$generator) {
-                            foreach ($rows as $row) {
-                                yield [
-                                    'article'  => $row->article,
-                                    'sku_code' => $row->sku_code,
-                                    'image'    => $row->image,
-                                ];
-                            }
-                        });
+                        ->orderBy('product_images.id');
+
+                    foreach ($query->cursor() as $row) {
+                        yield [
+                            'article' => $row->article,
+                            'sku_code' => $row->sku_code,
+                            'image' => $row->image,
+                        ];
+                    }
                 };
 
-                // FastExcel accepts a Generator — streams to xlsx without holding all rows in RAM
-                return (new FastExcel($generator()))->download(now().'_images.xlsx');
+                return (new FastExcel($rows()))->download(now().'_images.xlsx');
             }
             
             $imports = ImportedFileLog::where(['model_name'=>'productImage'])->get();
-            return view('admin.product_images.import',compact('imports'));
+            return view('admin.product_images.import', compact('imports'));
         }catch(\Throwable $e){
             Log::error('Product images import failed', [
                 'message' => $e->getMessage(),

@@ -17,6 +17,8 @@ use PowerComponents\LivewirePowerGrid\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 use PowerComponents\LivewirePowerGrid\PowerGridComponent;
 use PowerComponents\LivewirePowerGrid\Traits\WithExport;
+use Illuminate\Support\Facades\DB;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 final class ProductImagesIndex extends PowerGridComponent
 {
@@ -39,9 +41,47 @@ final class ProductImagesIndex extends PowerGridComponent
         ];
     }
 
+    /**
+     * Full export via FastExcel cursor — PowerGrid's default loads all ~13k rows and hits the 60s timeout.
+     */
+    public function exportToXLS(bool $selected = false): mixed
+    {
+        return $this->streamBulkExport('xlsx');
+    }
+
+    public function exportToCsv(bool $selected = false): mixed
+    {
+        return $this->streamBulkExport('csv');
+    }
+
+    protected function streamBulkExport(string $ext): mixed
+    {
+        @ini_set('memory_limit', '512M');
+        @set_time_limit(0);
+
+        $rows = function () {
+            $query = DB::table('product_images')
+                ->join('products', 'products.id', '=', 'product_images.product_id')
+                ->select('products.article', 'product_images.sku_code', 'product_images.image')
+                ->orderBy('product_images.id');
+
+            foreach ($query->cursor() as $row) {
+                yield [
+                    'article' => $row->article,
+                    'sku_code' => $row->sku_code,
+                    'image' => $row->image,
+                ];
+            }
+        };
+
+        return (new FastExcel($rows()))->download(now().'_images.'.$ext);
+    }
+
     public function datasource(): Builder
     {
-        return ProductImage::query()->orderByDesc('id');
+        return ProductImage::query()
+            ->with('product:id,article')
+            ->orderByDesc('id');
         /*return ProductImage::query()
             ->latest()
             ->when(
@@ -68,7 +108,7 @@ final class ProductImagesIndex extends PowerGridComponent
         return PowerGrid::fields()
             ->add('id')
             ->add('created_at_formatted', fn (ProductImage $model) => Carbon::parse($model->created_at)->timezone('Asia/Kolkata')->format('d M Y, H:i:s'))
-            ->add('article', fn (ProductImage $model) => $model->product->article??'')
+            ->add('article', fn (ProductImage $model) => $model->product?->article ?? '')
             ->add('sku_code')
             ->add('image')
             ->add('created_by')
