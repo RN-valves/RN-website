@@ -47,11 +47,16 @@ class AuthenticatedSessionController extends Controller
         }
 
         if(empty(Auth::user()->email_verified_at)){
-            Mail::to(Auth::user()->email)->send(
-                new RegisterMail(Auth::user())
-            );
-            Auth::logout();
-            return back()->with('status', 'Your Account Email not Verified! Please check your inbox and verify email');
+            if(Auth::user()->user_type === 'Customer'){
+                Auth::user()->email_verified_at = now();
+                Auth::user()->save();
+            } else {
+                Mail::to(Auth::user()->email)->send(
+                    new RegisterMail(Auth::user())
+                );
+                Auth::logout();
+                return back()->with('status', 'Your Account Email not Verified! Please check your inbox and verify email');
+            }
         }
 
         return redirect()->intended(route('dashboard', absolute: false));
@@ -141,14 +146,25 @@ class AuthenticatedSessionController extends Controller
        
                $input['user_code'] = $input['user_code']??'RN'.str()->random(10).'-'.User::max('id')+1;
                if($firstUser = User::where('mobile',$input['mobile_number'])->first()){
-                   $success = true;
-                   $message = 'Login successfully!';
-                   $redirect = url()->previous();
+                   if($firstUser->status == 'InActive'){
+                       return response()->json([
+                           'success' => false,
+                           'message' => 'Your account is not active. Please contact support.',
+                       ]);
+                   }
+
+                   if(empty($firstUser->email_verified_at)){
+                       $firstUser->email_verified_at = now();
+                       $firstUser->save();
+                   }
+
                    Auth::login($firstUser);
+                   $request->session()->regenerate();
+
                    return response()->json([
-                    'success' => $success,
-                    'message' => $message,
-                    'redirect' => $redirect,
+                    'success' => true,
+                    'message' => 'Login successfully!',
+                    'redirect' => url()->previous(),
                     'data' => '',
                 ]);
                }
@@ -164,6 +180,7 @@ class AuthenticatedSessionController extends Controller
                     'user_type' => $input['user_type'],
                     'uuid' => str()->uuid()->toString(),
                     'status' => 'Active',
+                    'email_verified_at' => now(),
                     'created_by' => $input['created_by'],
                     'gst_number' => $input['gst_number']??null,
                     'profession' => $input['profession']??"Consumer",
@@ -176,6 +193,7 @@ class AuthenticatedSessionController extends Controller
                $message = 'Login successfully!';
                $redirect = url()->previous();
                Auth::login($user);
+               $request->session()->regenerate();
             }else{
                 $success = false;
                 $message = $decodeData['message'];

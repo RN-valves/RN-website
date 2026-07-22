@@ -119,7 +119,7 @@ function razorpay_link_cancel($pay_link_id){
             'headers' => [
                 'content-type' => 'application/json'
             ],
-            'auth' => [env('RAZORPAY_KEY'), env('RAZORPAY_SECRET')],
+            'auth' => [trim(env('RAZORPAY_KEY')), trim(env('RAZORPAY_SECRET'))],
         ]);
     }catch(\Exception $e){
         return back()->with('error', $e->getMessage());
@@ -132,7 +132,7 @@ function razorypay_resend_text_payment_link($pay_link_id){
         'headers' => [
             'content-type' => 'application/json'
         ],
-        'auth' => [env('RAZORPAY_KEY'), env('RAZORPAY_SECRET')],
+        'auth' => [trim(env('RAZORPAY_KEY')), trim(env('RAZORPAY_SECRET'))],
     ]);
 }
 
@@ -145,19 +145,21 @@ function razorpay_post_order($order_id){
                 'headers' => [
                     'content-type' => 'application/json',
                 ],
-                'auth' => [env('RAZORPAY_KEY'), env('RAZORPAY_SECRET')],
+                'auth' => [trim(env('RAZORPAY_KEY')), trim(env('RAZORPAY_SECRET'))],
                 'json' => [
-                    'amount' => $getOrder->total_amount,
+                    'amount' => (int) round($getOrder->total_amount * 100),
                     'currency' => 'INR',
                     'receipt' => 'receipt#'.$getOrder->id,
                     'notes' => [
-                    'key1' => $getOrder->name,
-                    'key2' => $getOrder->mobile
+                        'key1' => !empty($getOrder->name) ? $getOrder->name : 'Customer',
+                        'key2' => !empty($getOrder->mobile) ? $getOrder->mobile : ''
                     ],
                 ]
             ]);
+        }catch(\GuzzleHttp\Exception\ClientException $e){
+            throw new \Exception(trim($e->getResponse()->getBody()->getContents()));
         }catch(\Exception $e){
-            return back()->with('error', 'Whoops! Something went wrong -'.$e->getMessage());
+            throw new \Exception('Whoops! Something went wrong - '.$e->getMessage());
         }
     }
 }
@@ -168,22 +170,25 @@ function razorpay_payment_link_create($order_id){
     if(!empty($getOrder)){
         try{
             $key = str()->uuid()->toString()."-".$getOrder->id;
+            $customerName = !empty($getOrder->name) ? $getOrder->name : 'Customer';
+            $customerMobile = !empty($getOrder->mobile) ? $getOrder->mobile : '9999999999';
+            $customerEmail = (!empty($getOrder->email) && filter_var($getOrder->email, FILTER_VALIDATE_EMAIL)) ? $getOrder->email : 'noreply@rnvalves.com';
+
             $payment_link_response = $client->post('https://api.razorpay.com/v1/payment_links/', [
                 'headers' => [
                     'Content-type' => 'application/json'
                 ],
-                'auth' => [env('RAZORPAY_KEY'), env('RAZORPAY_SECRET')],
+                'auth' => [trim(env('RAZORPAY_KEY')), trim(env('RAZORPAY_SECRET'))],
                 'json' => [
-                    'amount' => $getOrder->total_amount*100,
+                    'amount' => (int) round($getOrder->total_amount*100),
                     'currency' => 'INR',
                     'accept_partial' => false,
-                    'first_min_partial_amount' => $getOrder->total_amount*100,
                     'reference_id' => $getOrder->uuid,
                     'description' => $key,
                     'customer' => [
-                        'name' => $getOrder->name,
-                        'contact' => $getOrder->mobile,
-                        'email' => $getOrder->email,
+                        'name' => $customerName,
+                        'contact' => $customerMobile,
+                        'email' => $customerEmail,
                     ],
                     'notify' => [
                         'sms' => true,
@@ -200,8 +205,10 @@ function razorpay_payment_link_create($order_id){
             ]);
 
             return json_decode($payment_link_response->getBody());
+        }catch(\GuzzleHttp\Exception\ClientException $e){
+            throw new \Exception(trim($e->getResponse()->getBody()->getContents()));
         }catch(\Exception $e){
-            return back()->with('error', 'Whoops! Something went wrong -'.$e->getMessage());
+            throw new \Exception('Whoops! Something went wrong - '.$e->getMessage());
         }
     }else{
         abort(404);

@@ -229,7 +229,7 @@ class OrderController extends Controller
                 $order->shipping_charge_id = $data['shipping_charge_id'];
                 $order->name = $user->name;
                 $order->mobile = $user->mobile;
-                $order->email = $user->email;
+                $order->email = $user->email ?? 'noreply@rnvalves.com';
                 $order->country = $user->country->name??'';
                 $order->state = $user->state->name??'';
                 $order->city = $user->city->name??'';

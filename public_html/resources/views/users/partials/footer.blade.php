@@ -246,6 +246,14 @@ $(document).ready(function() {
     });
 
     $(document).ready(function () {
+  function showLoginError(message) {
+    if (typeof iziToast !== 'undefined') {
+      iziToast.error({position: 'topRight', message: message});
+    } else {
+      alert(message);
+    }
+  }
+
   // Send OTP
   $("#sendOtpBtn").on("click", function () {
     const mobileNumber = $("#mobileNumber").val();
@@ -263,13 +271,21 @@ $(document).ready(function() {
           $("#mobileForm").hide();
           $("#otpForm").show();
           $(".resendOtp-count").show();
-          iziToast.success({timeout: 5000, position: 'topRight', title: 'OK', message: response.message});
+          if (typeof iziToast !== 'undefined') {
+            iziToast.success({timeout: 5000, position: 'topRight', title: 'OK', message: response.message});
+          }
           startCountdown(30);
         } else {
-            iziToast.error({position: 'topRight', message: response.message});
+          showLoginError(response.message || 'Unable to send OTP. Please try again.');
         }
-        console.log(response.message);
       },
+      error: function (xhr) {
+        if (xhr.status === 419) {
+          showLoginError('Session expired. Please refresh the page and try again.');
+        } else {
+          showLoginError('Unable to send OTP. Please try again.');
+        }
+      }
     });
   });
 
@@ -300,13 +316,17 @@ $(document).ready(function() {
       data: { mobile_number: mobileNumber, _token: "{{ csrf_token() }}" },
       success: function (response) {
         if (response.success) {
-            iziToast.success({timeout: 5000, position: 'topRight', title: 'OK', message: response.message});
+            if (typeof iziToast !== 'undefined') {
+              iziToast.success({timeout: 5000, position: 'topRight', title: 'OK', message: response.message});
+            }
             startCountdown(30);
         } else {
-            iziToast.error({position: 'topRight', message: response.message});
+            showLoginError(response.message || 'Unable to resend OTP.');
         }
-        console.log(response.message);
       },
+      error: function () {
+        showLoginError('Unable to resend OTP. Please try again.');
+      }
     });
   });
 
@@ -325,15 +345,23 @@ $(document).ready(function() {
       data: { otp: otp, mobile_number: mobileNumber, _token: "{{ csrf_token() }}" },
       success: function (response) {
         if (response.success) {
-          iziToast.success({timeout: 5000, position: 'topRight', title: 'OK', message: response.message});
+          if (typeof iziToast !== 'undefined') {
+            iziToast.success({timeout: 5000, position: 'topRight', title: 'OK', message: response.message});
+          }
           setTimeout(function () {
               window.location.href = response.redirect;
           }, 1000);
         } else {    
-          iziToast.error({position: 'topRight', message: response.message});
+          showLoginError(response.message || 'Invalid OTP. Please try again.');
         }
-        console.log(response.message)
       },
+      error: function (xhr) {
+        if (xhr.status === 419) {
+          showLoginError('Session expired. Please refresh the page and try again.');
+        } else {
+          showLoginError('Unable to verify OTP. Please try again.');
+        }
+      }
     });
   });
  

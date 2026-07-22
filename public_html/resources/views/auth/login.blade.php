@@ -6,7 +6,9 @@
 <meta property="og:title" content="RN Valves & Faucets - Login">
 <meta property="og:image" content="{{url('users/assets/images/login.jpg')}}">
 <meta name="og:description" content="RN Valves & Faucets - Login">
+@if(!app()->environment('local'))
 <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_RECAPTCHA_KEY') }}"></script>
+@endif
 @endsection
 @section('content')
 <!--Sign Up Page-->
@@ -93,16 +95,44 @@
 <!--// Sign Up Page-->
 @endsection
 @section('scripts')
-<!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
 <script type="text/javascript">
-   $('#LoginForm').submit(function(event) {
+document.addEventListener('DOMContentLoaded', function () {
+   var loginForm = document.getElementById('LoginForm');
+   if (!loginForm) {
+      return;
+   }
+
+   @if(app()->environment('local'))
+   // Local dev: submit form directly (reCAPTCHA is skipped server-side too)
+   return;
+   @endif
+
+   loginForm.addEventListener('submit', function(event) {
        event.preventDefault();
+
+       if (typeof grecaptcha === 'undefined') {
+           alert('Security check is still loading. Please wait a moment and try again.');
+           return;
+       }
+
        grecaptcha.ready(function() {
-           grecaptcha.execute("{{ env('GOOGLE_RECAPTCHA_KEY') }}", {action: 'subscribe_newsletter'}).then(function(token) {
-               $('#LoginForm').prepend('<input type="hidden" name="g-recaptcha-response" value="' + token + '">');
-               $('#LoginForm').unbind('submit').submit();
-           });;
+           grecaptcha.execute("{{ env('GOOGLE_RECAPTCHA_KEY') }}", {action: 'subscribe_newsletter'})
+               .then(function(token) {
+                   loginForm.querySelectorAll('input[name="g-recaptcha-response"]').forEach(function(input) {
+                       input.remove();
+                   });
+                   var tokenInput = document.createElement('input');
+                   tokenInput.type = 'hidden';
+                   tokenInput.name = 'g-recaptcha-response';
+                   tokenInput.value = token;
+                   loginForm.prepend(tokenInput);
+                   loginForm.submit();
+               })
+               .catch(function() {
+                   alert('Security check failed. Please refresh the page and try again.');
+               });
        });
    });
+});
 </script>
 @endsection

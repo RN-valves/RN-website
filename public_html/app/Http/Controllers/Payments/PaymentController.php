@@ -520,19 +520,36 @@ public function place_order(Request $request){
 
         $order = new Order;
         if(!empty($user)){
+            $pincode = Pincode::where('code', $userAddress->zipcode ?? '')->first();
+
+            // Update user profile fields if empty (common for new users registered via OTP)
+            if (empty($user->name) && !empty($userAddress->name)) {
+                $user->name = $userAddress->name;
+            }
+            if (empty($user->zipcode) && !empty($userAddress->zipcode)) {
+                $user->zipcode = $userAddress->zipcode;
+                if ($pincode) {
+                    $user->pincode_id = $pincode->id;
+                    $user->city_id = $pincode->city_id;
+                    $user->state_id = $pincode->state_id;
+                    $user->country_id = $pincode->country_id;
+                }
+            }
+            if (empty($user->address) && !empty($userAddress->address)) {
+                $user->address = $userAddress->address;
+            }
+            $user->save();
+
             $order->user_id = trim($user->id);
             $order->shipping_charge_id = $userAddress->id ?? 0;
-            $order->name = $user->name;
-            $order->mobile = $user->mobile;
-            $order->email = $user->email;
-            $order->country = $user->country?->name ?? '';
-            $order->state = $user->state?->name ?? '';
-            $order->city = $user->city?->name ?? '';
-            $order->zipcode = $user->zipcode??'';
-
-            if(!empty($user->pincode_id)){
-                $order->pincode_id = $user->pincode_id;
-            }
+            $order->name = !empty($userAddress->name) ? $userAddress->name : (!empty($user->name) ? $user->name : 'Customer');
+            $order->mobile = !empty($userAddress->mobile) ? $userAddress->mobile : (!empty($user->mobile) ? $user->mobile : '');
+            $order->email = !empty($user->email) ? $user->email : 'noreply@rnvalves.com';
+            $order->country = $userAddress->country?->name ?? $user->country?->name ?? 'India';
+            $order->state = $userAddress->state?->name ?? $user->state?->name ?? 'N/A';
+            $order->city = $userAddress->city?->name ?? $user->city?->name ?? 'N/A';
+            $order->zipcode = $userAddress->zipcode ?? $user->zipcode ?? '000000';
+            $order->pincode_id = $pincode->id ?? $user->pincode_id ?? 0;
         }
 
         $order->uuid = str()->uuid()->toString();
@@ -593,17 +610,24 @@ RAZORPAY_SECRET=1hyBeHX7NLLaUtgQKhQNDdxe*/
 
                     $this->create_order_log_status($getOrder->id, "Pending");
 
-                    Mail::to($getOrder->email)->send(new OrderInvoiceMail($getOrder));
+                    try{
+                        if(!empty($getOrder->email)){
+                            Mail::to($getOrder->email)->send(new OrderInvoiceMail($getOrder));
+                        }
+                    }catch(\Exception $e){
+                        \Log::error('Order invoice mail failed: '.$e->getMessage());
+                    }
 
                     Cart::destroy();
                     $product = Product::whereIn('sku_code', $getOrder->order_items->pluck('product_code')->toArray())
                     ->orWhereIn('full_turn_code', $getOrder->order_items->pluck('product_code')->toArray())
                     ->first();  
                     $templateId = '67ab4b8ed6fc05376176c132';
+                    $productName = $product ? $product->name : 'RN Product';
                     $params = [
                         'mobiles' => '91'.$getOrder->mobile,
                         'orderid' => 'RNOD'.$getOrder->id,
-                        'product' => (string)$product->name.'....',
+                        'product' => (string)$productName.'....',
                     ];
                     SendSMS($templateId,$params);
 
@@ -626,12 +650,12 @@ RAZORPAY_SECRET=1hyBeHX7NLLaUtgQKhQNDdxe*/
                                 'pay_link_id' => $result->id,
                                 'short_url' => $result->short_url,
                                 'order_id' => $getOrder->id,
-                                'name' => $getOrder['name'],
-                                'mobile' => $getOrder['mobile'],
-                                'email' => $getOrder['email'],
-                                'state' => $getOrder['state'],
-                                'city' => $getOrder['city'],
-                                'zipcode' => $getOrder['zipcode'],
+                                'name' => !empty($getOrder->name) ? $getOrder->name : 'Customer',
+                                'mobile' => !empty($getOrder->mobile) ? $getOrder->mobile : '',
+                                'email' => !empty($getOrder->email) ? $getOrder->email : 'noreply@rnvalves.com',
+                                'state' => !empty($getOrder->state) ? $getOrder->state : 'N/A',
+                                'city' => !empty($getOrder->city) ? $getOrder->city : 'N/A',
+                                'zipcode' => !empty($getOrder->zipcode) ? $getOrder->zipcode : '000000',
                                 'payment_gateway' => "Razorypay",
                                 'payment_key' => env('RAZORPAY_KEY'),
                                 'payment_secret_key' => env('RAZORPAY_SECRET'),
@@ -684,16 +708,24 @@ RAZORPAY_SECRET=1hyBeHX7NLLaUtgQKhQNDdxe*/
                     $payment->save();
                 }
 
-                Mail::to($getSingleOrderUuid->email)->cc('ecommerce@rnvalves.com')->send(new OrderInvoiceMail($getSingleOrderUuid));
+                try{
+                    if(!empty($getSingleOrderUuid->email)){
+                        Mail::to($getSingleOrderUuid->email)->cc('ecommerce@rnvalves.com')->send(new OrderInvoiceMail($getSingleOrderUuid));
+                    }
+                }catch(\Exception $e){
+                    \Log::error('Razorpay success invoice mail failed: '.$e->getMessage());
+                }
+
                 $templateId = '67ab4b8ed6fc05376176c132';
                 Cart::destroy();
                 $product = Product::whereIn('sku_code', $getSingleOrderUuid->order_items->pluck('product_code')->toArray())
                 ->orWhereIn('full_turn_code', $getSingleOrderUuid->order_items->pluck('product_code')->toArray())
                 ->first();  
+                $productName = $product ? $product->name : 'RN Product';
                 $params = [
                     'mobiles' => '91'.$getSingleOrderUuid->mobile,
                     'orderid' => 'RNOD'.$getSingleOrderUuid->id,
-                    'product' => (string)$product->name.'....',
+                    'product' => (string)$productName.'....',
                 ];
                 SendSMS($templateId,$params);
                 return redirect(route('order_placed_success',['orderAmount' => $getSingleOrderUuid->total_amount, 'transactionId' => $getSingleOrderUuid->id]))->with('success', 'Order successfully placed, Order is : RNOD'.$getSingleOrderUuid->id. ' Thank you!');
