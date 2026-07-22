@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\File;
 use GuzzleHttp\Client;
 
 function export_fast_excel($sheet, $sheetname){
+    @ini_set('memory_limit', '1024M');
+    @set_time_limit(600);
+
 	$header_style = (new Style())
         ->setFontBold()
         ->setFontSize(13)

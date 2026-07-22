@@ -14,6 +14,7 @@ use Excel;
 use Rap2hpoutre\FastExcel\FastExcel;
 use App\Traits\DefaultTrait;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ProductImagesController extends Controller
 {
@@ -151,13 +152,34 @@ class ProductImagesController extends Controller
             }
             
             if($request->export=="export"){
+                // Template export — 1 sample row only
                 $enquiries = ProductImage::select('sku_code','image')->limit(1)->get();
                 return export_fast_excel($enquiries, now().'_images.xlsx');
             }
             
             if($request->update=="update"){
-                $enquiries = ProductImage::join('products','products.id','=', 'product_images.product_id')->select('products.article','product_images.sku_code','product_images.image')->get();
-                return export_fast_excel($enquiries, now().'_images.xlsx');
+                // Stream 16k+ rows using a generator/cursor — never loads all rows into memory
+                @ini_set('memory_limit', '1024M');
+                @set_time_limit(600);
+
+                $generator = function () {
+                    DB::table('product_images')
+                        ->join('products', 'products.id', '=', 'product_images.product_id')
+                        ->select('products.article', 'product_images.sku_code', 'product_images.image')
+                        ->orderBy('product_images.id')
+                        ->chunk(500, function ($rows) use (&$generator) {
+                            foreach ($rows as $row) {
+                                yield [
+                                    'article'  => $row->article,
+                                    'sku_code' => $row->sku_code,
+                                    'image'    => $row->image,
+                                ];
+                            }
+                        });
+                };
+
+                // FastExcel accepts a Generator — streams to xlsx without holding all rows in RAM
+                return (new FastExcel($generator()))->download(now().'_images.xlsx');
             }
             
             $imports = ImportedFileLog::where(['model_name'=>'productImage'])->get();
