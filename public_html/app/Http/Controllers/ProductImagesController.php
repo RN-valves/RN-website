@@ -15,7 +15,6 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use App\Traits\DefaultTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 
 class ProductImagesController extends Controller
 {
@@ -31,11 +30,8 @@ class ProductImagesController extends Controller
 
     public function index(){
         try{
-            $updateTemplatePath = storage_path('app/exports/product_images_update_template.xlsx');
-            $updateTemplatePending = is_file($updateTemplatePath.'.pending');
-            $updateTemplateReady = is_file($updateTemplatePath) && !$updateTemplatePending;
-
-            return view('admin.product_images.index', compact('updateTemplateReady', 'updateTemplatePending'));
+            $productImages = ProductImage::get();
+            return view('admin.product_images.index', compact('productImages'));
         }catch(\Exception $e){
             return back()->with('error', $e->getMessage());
         }
@@ -162,36 +158,32 @@ class ProductImagesController extends Controller
             }
             
             if($request->update=="update"){
-                $output = storage_path('app/exports/product_images_update_template.xlsx');
-                $pending = $output.'.pending';
-                File::ensureDirectoryExists(dirname($output), 0775, true);
+                // Stream 16k+ rows using a generator/cursor — never loads all rows into memory
+                @ini_set('memory_limit', '1024M');
+                @set_time_limit(600);
 
-                if ($request->download == '1') {
-                    if (is_file($output) && !is_file($pending)) {
-                        return response()->download($output, now().'_images.xlsx');
-                    }
+                $generator = function () {
+                    DB::table('product_images')
+                        ->join('products', 'products.id', '=', 'product_images.product_id')
+                        ->select('products.article', 'product_images.sku_code', 'product_images.image')
+                        ->orderBy('product_images.id')
+                        ->chunk(500, function ($rows) use (&$generator) {
+                            foreach ($rows as $row) {
+                                yield [
+                                    'article'  => $row->article,
+                                    'sku_code' => $row->sku_code,
+                                    'image'    => $row->image,
+                                ];
+                            }
+                        });
+                };
 
-                    return back()->with('error', 'Update Template is not ready yet. Wait a bit and try Download Ready again.');
-                }
-
-                if (is_file($pending)) {
-                    return back()->with('success', 'Update Template is still being prepared. Wait 2-3 minutes, refresh this page, then click Download Ready.');
-                }
-
-                if (is_file($output) && filemtime($output) > (time() - 900) && !$request->boolean('rebuild')) {
-                    return response()->download($output, now().'_images.xlsx');
-                }
-
-                $this->spawnArtisanBackground('product-images:export-update-template', [$output]);
-
-                return back()->with('success', 'Preparing Update Template in the background (~16k rows). Refresh in 2-3 minutes and click Download Ready.');
+                // FastExcel accepts a Generator — streams to xlsx without holding all rows in RAM
+                return (new FastExcel($generator()))->download(now().'_images.xlsx');
             }
             
             $imports = ImportedFileLog::where(['model_name'=>'productImage'])->get();
-            $updateTemplatePath = storage_path('app/exports/product_images_update_template.xlsx');
-            $updateTemplatePending = is_file($updateTemplatePath.'.pending');
-            $updateTemplateReady = is_file($updateTemplatePath) && !$updateTemplatePending;
-            return view('admin.product_images.import', compact('imports', 'updateTemplateReady', 'updateTemplatePending'));
+            return view('admin.product_images.import',compact('imports'));
         }catch(\Throwable $e){
             Log::error('Product images import failed', [
                 'message' => $e->getMessage(),
@@ -200,43 +192,5 @@ class ProductImagesController extends Controller
             ]);
             return back()->with('error', $e->getMessage());
         }
-    }
-
-    protected function spawnArtisanBackground(string $command, array $arguments = []): void
-    {
-        $php = (defined('PHP_BINARY') && PHP_BINARY) ? PHP_BINARY : 'php';
-        $artisan = base_path('artisan');
-        $args = collect($arguments)->map(fn ($arg) => escapeshellarg($arg))->implode(' ');
-        $log = storage_path('logs/artisan-bg.log');
-
-        Log::info('Spawning background artisan', [
-            'command' => $command,
-            'arguments' => $arguments,
-        ]);
-
-        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
-        $canExec = function_exists('exec') && !in_array('exec', $disabled, true)
-            && function_exists('popen') && !in_array('popen', $disabled, true);
-
-        if ($canExec) {
-            if (strncasecmp(PHP_OS, 'WIN', 3) === 0) {
-                $cmd = "start /B \"\" {$php} \"{$artisan}\" {$command} {$args} >> \"{$log}\" 2>&1";
-                pclose(popen($cmd, 'r'));
-                return;
-            }
-
-            $cmd = sprintf(
-                'nohup %s %s %s %s >> %s 2>&1 < /dev/null &',
-                escapeshellarg($php),
-                escapeshellarg($artisan),
-                $command,
-                $args,
-                escapeshellarg($log)
-            );
-            exec($cmd);
-            return;
-        }
-
-        throw new \RuntimeException('Unable to start background process for product image export.');
     }
 }

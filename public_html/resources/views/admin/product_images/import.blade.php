@@ -34,16 +34,7 @@
                   <li></li>
                </ul>
                <a href="{{ route('productImages.import_productImages', ['export'=>'export']) }}" class="btn btn-sm btn-info border"> <i class="bx bx-cloud-download"></i> Add New Template</a>
-               @if(!empty($updateTemplatePending ?? false))
-                  <a href="javascript:void(0)" class="btn btn-sm btn-warning border disabled" aria-disabled="true"> <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Exporting...</a>
-               @else
-                  <a href="{{ route('productImages.import_productImages', ['update'=>'update', 'rebuild'=>1]) }}" class="btn btn-sm btn-warning border js-product-images-export"> <i class="bx bx-download"></i> Update Template</a>
-               @endif
-               @if(!empty($updateTemplateReady ?? false))
-                  <a href="{{ route('productImages.import_productImages', ['update'=>'update', 'download'=>1]) }}" class="btn btn-sm btn-success border mt-2"> <i class="bx bx-check"></i> Download Ready</a>
-               @else
-                  <a href="javascript:void(0)" class="btn btn-sm btn-success border mt-2 disabled" aria-disabled="true"> <i class="bx bx-time"></i> Download Ready</a>
-               @endif
+               <a href="{{ route('productImages.import_productImages', ['update'=>'update']) }}" class="btn btn-sm btn-warning border"> <i class="bx bx-download"></i> Update Template</a>
             </div>
          </div>
          <div class="col-lg-6 text-center text-sm-left">
@@ -91,38 +82,5 @@ $(document).ready(function(){
           placeholder: "Select a category",
           allowClear: true
       });
-</script>
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function () {
-   var storageKey = 'product-images-export-pending';
-   var exportButton = document.querySelector('.js-product-images-export');
-   var isPending = @json(!empty($updateTemplatePending ?? false));
-   var isReady = @json(!empty($updateTemplateReady ?? false));
-
-   if (exportButton) {
-      exportButton.addEventListener('click', function () {
-         localStorage.setItem(storageKey, '1');
-      });
-   }
-
-   if (isPending) {
-      localStorage.setItem(storageKey, '1');
-      window.setTimeout(function () {
-         window.location.reload();
-      }, 4000);
-      return;
-   }
-
-   if (isReady && localStorage.getItem(storageKey) === '1') {
-      localStorage.removeItem(storageKey);
-      if (typeof toastr !== 'undefined') {
-         toastr.options = {
-            closeButton: true,
-            progressBar: true,
-         };
-         toastr.success('Product images export is ready for download.');
-      }
-   }
-});
 </script>
 @endsection
