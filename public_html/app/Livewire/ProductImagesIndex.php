@@ -62,11 +62,17 @@ final class ProductImagesIndex extends PowerGridComponent
         $rows = function () {
             $query = DB::table('product_images')
                 ->join('products', 'products.id', '=', 'product_images.product_id')
-                ->select('products.article', 'product_images.sku_code', 'product_images.image')
+                ->select(
+                    'product_images.id',
+                    'products.article',
+                    'product_images.sku_code',
+                    'product_images.image'
+                )
                 ->orderBy('product_images.id');
 
             foreach ($query->cursor() as $row) {
                 yield [
+                    'id' => $row->id,
                     'article' => $row->article,
                     'sku_code' => $row->sku_code,
                     'image' => $row->image,

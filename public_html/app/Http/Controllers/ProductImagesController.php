@@ -147,7 +147,7 @@ class ProductImagesController extends Controller
 
                 //upload history for public path
                 common_import_store($request, 'import_file', 'productImage');
-                return back()->with('success', 'file uploaded successfully');
+                return back()->with('success', isset($import) ? $import->summaryMessage() : 'file uploaded successfully');
             }
             
             if($request->export=="export"){
@@ -165,11 +165,17 @@ class ProductImagesController extends Controller
                 $rows = function () {
                     $query = DB::table('product_images')
                         ->join('products', 'products.id', '=', 'product_images.product_id')
-                        ->select('products.article', 'product_images.sku_code', 'product_images.image')
+                        ->select(
+                            'product_images.id',
+                            'products.article',
+                            'product_images.sku_code',
+                            'product_images.image'
+                        )
                         ->orderBy('product_images.id');
 
                     foreach ($query->cursor() as $row) {
                         yield [
+                            'id' => $row->id,
                             'article' => $row->article,
                             'sku_code' => $row->sku_code,
                             'image' => $row->image,
