@@ -31,8 +31,11 @@ class ProductImagesController extends Controller
 
     public function index(){
         try{
-            $productImages = ProductImage::get();
-            return view('admin.product_images.index', compact('productImages'));
+            $updateTemplatePath = storage_path('app/exports/product_images_update_template.xlsx');
+            $updateTemplatePending = is_file($updateTemplatePath.'.pending');
+            $updateTemplateReady = is_file($updateTemplatePath) && !$updateTemplatePending;
+
+            return view('admin.product_images.index', compact('updateTemplateReady', 'updateTemplatePending'));
         }catch(\Exception $e){
             return back()->with('error', $e->getMessage());
         }
