@@ -34,7 +34,7 @@
             @if(!empty($productImage['image']) && $galleryImage !== '' && $galleryImage !== $mainImage)
             <li>
                <a href='javascript:void(0);' rel="{gallery: 'gal1', smallimage: '{{ url($productImage['image']) }}',largeimage: '{{ url($productImage['image']) }}'}">
-               <img src="{{ url($productImage['image']) }}"  class="thmbs" alt="{{ $getSingleProduct['title']??'' }}" onerror="this.closest('li')?.remove()">
+               <img src="{{ url($productImage['image']) }}"  class="thmbs" alt="{{ $getSingleProduct['title']??'' }}">
                </a>
             </li>
             @endif
@@ -61,7 +61,7 @@
       @if(!empty($productImage['image']) && $galleryImage !== '' && $galleryImage !== $mainImage)
       <!---img loop---->
       <div class="pro_img_bxxbx">
-         <img src="{{ url($productImage['image']) }}" alt="{{ $getSingleProduct['title']??'' }}" onerror="this.closest('.pro_img_bxxbx')?.remove()"> 
+         <img src="{{ url($productImage['image']) }}" alt="{{ $getSingleProduct['title']??'' }}"> 
       </div>
       <!---img loop---->
       @endif

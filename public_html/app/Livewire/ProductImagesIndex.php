@@ -59,7 +59,10 @@ final class ProductImagesIndex extends PowerGridComponent
         @ini_set('memory_limit', '512M');
         @set_time_limit(0);
 
-        $rows = function () {
+        $search = $this->search ?? '';
+        $filters = $this->filters ?? [];
+
+        $rows = function () use ($search, $filters) {
             $query = DB::table('product_images')
                 ->join('products', 'products.id', '=', 'product_images.product_id')
                 ->select(
@@ -69,6 +72,35 @@ final class ProductImagesIndex extends PowerGridComponent
                     'product_images.image'
                 )
                 ->orderBy('product_images.id');
+
+            if (!empty($search)) {
+                $query->where(function($q) use ($search) {
+                    $q->where('products.article', 'like', "%{$search}%")
+                      ->orWhere('product_images.sku_code', 'like', "%{$search}%")
+                      ->orWhere('product_images.image', 'like', "%{$search}%")
+                      ->orWhere('product_images.created_by', 'like', "%{$search}%");
+                });
+            }
+
+            if (!empty($filters['input_text']['article'])) {
+                $query->where('products.article', 'like', "%" . $filters['input_text']['article'] . "%");
+            }
+
+            if (!empty($filters['input_text']['sku_code'])) {
+                $query->where('product_images.sku_code', 'like', "%" . $filters['input_text']['sku_code'] . "%");
+            }
+
+            if (!empty($filters['input_text']['image'])) {
+                $query->where('product_images.image', 'like', "%" . $filters['input_text']['image'] . "%");
+            }
+
+            if (!empty($filters['input_text']['created_by'])) {
+                $query->where('product_images.created_by', 'like', "%" . $filters['input_text']['created_by'] . "%");
+            }
+
+            if (!empty($filters['input_text']['created_at'])) {
+                $query->where('product_images.created_at', 'like', "%" . $filters['input_text']['created_at'] . "%");
+            }
 
             foreach ($query->cursor() as $row) {
                 yield [

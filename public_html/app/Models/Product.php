@@ -150,7 +150,7 @@ class Product extends Model
 
     public static function getSingleProduct($url_key){
         return self::where('url_key','=',$url_key)
-            ->with('bullets')
+            ->with(['bullets', 'productImages'])
             ->where('products.status', '=', 'Active')
             ->where('products.is_visible_website', '=', 1)
             ->whereNull('deleted_at')
