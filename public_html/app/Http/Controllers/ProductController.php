@@ -30,6 +30,7 @@ use App\Jobs\ProcessUploadProduct;
 use Rap2hpoutre\FastExcel\SheetCollection;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use App\Support\ProductImportProgress;
 
 class ProductController extends Controller
 {
@@ -578,6 +579,37 @@ class ProductController extends Controller
 
         try {
             if($request->isMethod('post')){
+                // Phase 2: User confirmed preview and clicked "Confirm & Apply Import"
+                if ($request->filled('confirm_file_path')) {
+                    $absolutePath = $request->input('confirm_file_path');
+                    if (!\Illuminate\Support\Facades\File::exists($absolutePath)) {
+                        return back()->with('error', 'The uploaded file session expired. Please upload the file again.');
+                    }
+
+                    $totalRows = ProductImportProgress::countExcelDataRows($absolutePath);
+                    $import = new ProductImport();
+
+                    if ($totalRows > 0 && $totalRows <= 100) {
+                        $import->import($absolutePath);
+                        $skipped = $import->getSkippedRows();
+
+                        $msg = "{$totalRows} product(s) processed successfully!";
+                        if (!empty($skipped)) {
+                            $msg .= ' (' . count($skipped) . ' row(s) skipped due to errors)';
+                        }
+
+                        return redirect()->route('products.import_products')
+                            ->with('success', $msg)
+                            ->with('skipped_rows', $skipped);
+                    }
+
+                    $this->spawnArtisanBackground('products:import-excel', [$absolutePath]);
+
+                    return redirect()->route('products.import_products')
+                        ->with('success', "File uploaded ({$totalRows} rows). Import is running in the background. Refresh the products list shortly.");
+                }
+
+                // Phase 1: File uploaded -> Analyze and return Preview & Pre-Check data
                 $request->validate([
                     'import_file' => ['required','mimes:xlsx'],
                 ]);
@@ -586,7 +618,6 @@ class ProductController extends Controller
                     $originalName = $upload->getClientOriginalName();
                     $extension = $upload->getClientOriginalExtension();
 
-                    // Must use local disk — default FILESYSTEM_DISK may be s3 (no local paths).
                     $storedPath = $upload->store('temp', 'local');
                     $absolutePath = Storage::disk('local')->path($storedPath);
 
@@ -603,10 +634,17 @@ class ProductController extends Controller
                         'file_path' => 'uploads/imports/'.$fileName,
                     ]);
 
-                    // Detached CLI process — returns in <1s; nginx will not 504.
-                    $this->spawnArtisanBackground('products:import-excel', [$absolutePath]);
+                    $import = new ProductImport();
+                    $previewData = $import->validateAndAnalyze($absolutePath);
+                    $previewData['file_path'] = $absolutePath;
+                    $previewData['original_name'] = $originalName;
 
-                    return back()->with('success', 'File uploaded. Import is running in the background — large sheets (~7000 rows) may take a few minutes. Refresh the products list shortly.');
+                    $imports = ImportedFileLog::where(['model_name'=>'product'])->get();
+                    $updateTemplatePath = storage_path('app/exports/products_update_template.xlsx');
+                    $updateTemplatePending = is_file($updateTemplatePath.'.pending');
+                    $updateTemplateReady = is_file($updateTemplatePath) && !$updateTemplatePending;
+
+                    return view('admin.products.import', compact('imports', 'updateTemplateReady', 'updateTemplatePending', 'previewData'));
                 }
                 return back()->with('error', 'Please choose an Excel file to upload.');
             }

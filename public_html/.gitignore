@@ -25,6 +25,8 @@ storage/logs/*.log
 storage/framework/cache/data/*
 storage/framework/sessions/*
 storage/framework/views/*
+/public/uploads/imports/*
+!/public/uploads/imports/.gitkeep
 
 __MACOSX/
 .DS_Store
