@@ -478,8 +478,13 @@ function shiprocketToken(){
         return $token;
     }
 
-    $email = config('services.shiprocket.email', 'digital@rnvalves.com');
-    $password = config('services.shiprocket.password', 'E@Y6gjHRin7dD#n&qZdyd!PD8&pRETfO');
+    $email = config('services.shiprocket.email', env('SHIPROCKET_EMAIL'));
+    $password = config('services.shiprocket.password', env('SHIPROCKET_PASSWORD'));
+    if (empty($email) || empty($password)) {
+        \Illuminate\Support\Facades\Log::error('Shiprocket credentials missing in environment (.env).');
+        return null;
+    }
+
     $client = new Client();
     try {
         $response = $client->post('https://apiv2.shiprocket.in/v1/external/auth/login', [
@@ -626,7 +631,7 @@ function order_push_shiprocket($order, $request)
     $paymentMethod = ($order->payment_term == 'Prepaid') ? 'Prepaid' : 'COD';
     $pickupLocation = config('services.shiprocket.pickup_location', 'Home');
 
-    $billingEmail = (!empty($order->email) && filter_var($order->email, FILTER_VALIDATE_EMAIL)) ? $order->email : 'digital@rnvalves.com';
+    $billingEmail = (!empty($order->email) && filter_var($order->email, FILTER_VALIDATE_EMAIL)) ? $order->email : (config('services.shiprocket.email') ?: 'billing@rnvalves.com');
     $billingPhone = preg_replace('/[^0-9]/', '', (string)$order->mobile);
     if (strlen($billingPhone) > 10) {
         $billingPhone = substr($billingPhone, -10);
