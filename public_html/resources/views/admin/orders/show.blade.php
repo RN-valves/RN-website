@@ -300,12 +300,16 @@
                      <th>Transport Contact</th>
                      <td>{{ @$order->orderTransort->transport_contact??'' }}</td>
                      <th>Transport Tracking URL</th>
-                     <td>{{ @$order->orderTransort->transport_url??'' }}</td>
+                     <td>
+                        @if(!empty($order->orderTransort->transport_url))
+                           <a target="_blank" href="{{ $order->orderTransort->transport_url }}">{{ $order->orderTransort->transport_url }}</a>
+                        @endif
+                     </td>
                   </tr>
                   <tr>
                      @if(!empty($order->orderTransort->attachment))
                      <th>Transport Slip</th>
-                     <td><a target="_blank" href="{{ url($order->orderTransort->attachment??'https://rnvalves.shipway.com/track') }}">Download</a></td>
+                     <td><a target="_blank" href="{{ url($order->orderTransort->attachment) }}">Download Slip</a></td>
                      @endif
 
                      <th>Transport Tracking ID</th>
@@ -337,43 +341,75 @@ $(document).ready(function () {
    $(".confirm-form").submit(function (e) {
       $("#btn-submit").attr("disabled", true);
       return true;
-         
+   });
+
+   $(document).on('change', 'input[name="shipping_provider"]', function() {
+      $('#carrier_id').empty().append('<option value="">Select Courier (Click Calculate)</option>');
+      $('#courier_name').val('');
+      $('#delivery_charge').val('');
+      $('#cod_charge').val('');
    });
 
    $(document).on('click', '#calculate_btn', function() {
-    var order_id = "{{$order->id}}";
-    var length = parseFloat($('#box_length').val()) || 0;
-    var breadth = parseFloat($('#box_breadth').val()) || 0;
-    var height = parseFloat($('#box_height').val()) || 0;
-    var weight = parseFloat($('#box_weight').val()) || 0;
+      var order_id = "{{$order->id}}";
+      var length = parseFloat($('#box_length').val()) || 0;
+      var breadth = parseFloat($('#box_breadth').val()) || 0;
+      var height = parseFloat($('#box_height').val()) || 0;
+      var weight = parseFloat($('#box_weight').val()) || 0;
+      var provider = $('input[name="shipping_provider"]:checked').val() || 'shiprocket';
 
-      if (length > 0 && breadth > 0 && height > 0 && weight > 0) {
-        $.ajax({
-            url: "{{ route('orders.carrier.rate') }}",
-            type: "GET",
-            data: {
-                length: length,
-                breadth: breadth,
-                height: height,
-                weight: weight,
-                order_id: order_id
-            },
-            success: function(data) {
-                console.log(data);
-                $('#carrier_id').empty().append(data.html)
-            },
-            error: function(xhr) {
-                alert("Error: " + xhr.responseText);
-            }
-        });
+      if (length <= 0 || breadth <= 0 || height <= 0 || weight <= 0) {
+         alert('Please enter valid package Length, Breadth, Height and Weight.');
+         return;
       }
+
+      $('#calc_text').text('Calculating...');
+      $('#calc_spinner').removeClass('d-none');
+      $('#calculate_btn').attr('disabled', true);
+
+      $.ajax({
+          url: "{{ route('orders.carrier.rate') }}",
+          type: "GET",
+          data: {
+              length: length,
+              breadth: breadth,
+              height: height,
+              weight: weight,
+              order_id: order_id,
+              shipping_provider: provider
+          },
+          success: function(data) {
+              $('#calc_text').text('Calculate Rates');
+              $('#calc_spinner').addClass('d-none');
+              $('#calculate_btn').attr('disabled', false);
+
+              if (data.html) {
+                  $('#carrier_id').empty().append(data.html);
+              } else if (data.error) {
+                  alert(data.error);
+              }
+          },
+          error: function(xhr) {
+              $('#calc_text').text('Calculate Rates');
+              $('#calc_spinner').addClass('d-none');
+              $('#calculate_btn').attr('disabled', false);
+
+              var errMsg = "Failed to fetch carrier rates.";
+              try {
+                  var res = JSON.parse(xhr.responseText);
+                  if (res.error) errMsg = res.error;
+                  else if (res.message) errMsg = res.message;
+              } catch(e) {}
+              alert("Error: " + errMsg);
+          }
+      });
    });
    
    $(document).on('change', '#carrier_id', function () {
       let selectedOption = $(this).find(':selected');
-      let courierName = selectedOption.data('courier-name'); 
-      let deliveryCharge = selectedOption.data('delivery-charge');
-      let codCharge = selectedOption.data('cod-charge');
+      let courierName = selectedOption.data('courier-name') || ''; 
+      let deliveryCharge = selectedOption.data('delivery-charge') || 0;
+      let codCharge = selectedOption.data('cod-charge') || 0;
       
       $('#courier_name').val(courierName);
       $('#delivery_charge').val(deliveryCharge);

@@ -164,7 +164,7 @@ class AuthController extends Controller
                     }
                      
                     Mail::to($getSingleOrder->email)->send(new OrderStatusMail($getSingleOrder));
-                    order_cancel_shipway($getSingleOrder);
+                    order_cancel_shipping($getSingleOrder);
                     return back()->with('success', 'Order has been cancelled successfully');
                 }
             }catch(\Exception $e){

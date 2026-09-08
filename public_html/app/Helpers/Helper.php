@@ -472,4 +472,363 @@ function SendSMS($templateid='',$params = [])
        
     }
 
+function shiprocketToken(){
+    $token = \Illuminate\Support\Facades\Cache::get('shiprocket_api_jwt_token');
+    if(!empty($token)){
+        return $token;
+    }
+
+    $email = config('services.shiprocket.email', 'digital@rnvalves.com');
+    $password = config('services.shiprocket.password', 'E@Y6gjHRin7dD#n&qZdyd!PD8&pRETfO');
+    $client = new Client();
+    try {
+        $response = $client->post('https://apiv2.shiprocket.in/v1/external/auth/login', [
+            'headers' => ['Content-Type' => 'application/json'],
+            'json' => [
+                'email' => $email,
+                'password' => $password,
+            ],
+        ]);
+        $data = json_decode($response->getBody()->getContents(), true);
+        if(!empty($data['token'])){
+            \Illuminate\Support\Facades\Cache::put('shiprocket_api_jwt_token', $data['token'], now()->addDays(7));
+            return $data['token'];
+        }
+        return null;
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Shiprocket Auth Error: ' . $e->getMessage());
+        return null;
+    }
+}
+
+function get_shiprocket_rates($order, $request)
+{
+    $token = shiprocketToken();
+    if (!$token) {
+        \Illuminate\Support\Facades\Cache::forget('shiprocket_api_jwt_token');
+        $token = shiprocketToken();
+        if (!$token) {
+            return [
+                'success' => false,
+                'error' => 'Failed to authenticate with Shiprocket API.',
+            ];
+        }
+    }
+
+    $client = new Client();
+    $paymentMode = ($order->payment_term == 'Prepaid') ? 0 : 1;
+    $weightInKg = floatval($request->weight);
+    if ($weightInKg <= 0) {
+        $weightInKg = 0.5;
+    }
+
+    $pickupPincode = config('services.shiprocket.pickup_pincode', 201010);
+    $deliveryPincode = (int) $order->zipcode;
+
+    $queryParams = http_build_query([
+        'pickup_postcode' => $pickupPincode,
+        'delivery_postcode' => $deliveryPincode,
+        'weight' => $weightInKg,
+        'cod' => $paymentMode,
+        'declared_value' => (int) $order->total_amount,
+        'is_return' => 0,
+        'length' => floatval($request->length) > 0 ? floatval($request->length) : 10,
+        'breadth' => floatval($request->breadth) > 0 ? floatval($request->breadth) : 10,
+        'height' => floatval($request->height) > 0 ? floatval($request->height) : 10,
+    ]);
+
+    try {
+        $response = $client->get('https://apiv2.shiprocket.in/v1/external/courier/serviceability/?' . $queryParams, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        if (!isset($data['data']['available_courier_companies']) || empty($data['data']['available_courier_companies'])) {
+            return [
+                'success' => false,
+                'error' => 'No Shiprocket courier service available for this pincode (' . $deliveryPincode . ').',
+            ];
+        }
+
+        $options = "<option value=''>Select Courier (Shiprocket)</option>";
+        foreach ($data['data']['available_courier_companies'] as $rate) {
+            $deliveryCharge = floatval($rate['rate']);
+            $gstCharge = round($deliveryCharge * 18 / 100, 2);
+            $totalDeliveryCharge = round($gstCharge + $deliveryCharge, 2);
+            $codCharge = isset($rate['cod_charges']) ? floatval($rate['cod_charges']) : 0;
+            $etd = !empty($rate['etd']) ? " (ETD: " . $rate['etd'] . ")" : "";
+
+            $options .= "<option value='{$rate['courier_company_id']}' data-courier-name='{$rate['courier_name']}' data-delivery-charge='{$deliveryCharge}' data-cod-charge='{$codCharge}' data-provider='shiprocket'>";
+            $options .= "{$rate['courier_name']} - ₹ {$totalDeliveryCharge}{$etd}";
+            if ($order->payment_term == 'COD' && $codCharge > 0) {
+                $options .= " (COD: ₹ {$codCharge})";
+            }
+            $options .= "</option>";
+        }
+
+        return [
+            'success' => true,
+            'all' => $data['data']['available_courier_companies'],
+            'html' => $options,
+            'message' => 'Shiprocket couriers fetched successfully',
+        ];
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+        $body = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+        \Illuminate\Support\Facades\Log::error('Shiprocket Rate Error: ' . $body);
+        return [
+            'success' => false,
+            'error' => 'Shiprocket error: ' . $body,
+        ];
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Shiprocket Rate Error: ' . $e->getMessage());
+        return [
+            'success' => false,
+            'error' => $e->getMessage(),
+        ];
+    }
+}
+
+function order_push_shiprocket($order, $request)
+{
+    $token = shiprocketToken();
+    if (!$token) {
+        \Illuminate\Support\Facades\Cache::forget('shiprocket_api_jwt_token');
+        $token = shiprocketToken();
+        if (!$token) {
+            return ['status' => false, 'message' => 'Shiprocket authentication failed.'];
+        }
+    }
+
+    $client = new Client();
+    $headers = [
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type' => 'application/json',
+    ];
+
+    $orderItems = OrderItem::where('order_id', $order->id)->get();
+    $items = [];
+    foreach ($orderItems as $item) {
+        $items[] = [
+            'name' => !empty($item->product->name) ? $item->product->name : ('Product ' . $item->product_code),
+            'sku' => (string) $item->product_code,
+            'units' => (int) $item->total_qty,
+            'selling_price' => (float) $item->price,
+            'discount' => 0,
+            'tax' => 0,
+            'hsn' => !empty($item->product->hsn) ? (string) $item->product->hsn : '',
+        ];
+    }
+
+    $paymentMethod = ($order->payment_term == 'Prepaid') ? 'Prepaid' : 'COD';
+    $pickupLocation = config('services.shiprocket.pickup_location', 'Home');
+
+    $billingEmail = (!empty($order->email) && filter_var($order->email, FILTER_VALIDATE_EMAIL)) ? $order->email : 'digital@rnvalves.com';
+    $billingPhone = preg_replace('/[^0-9]/', '', (string)$order->mobile);
+    if (strlen($billingPhone) > 10) {
+        $billingPhone = substr($billingPhone, -10);
+    }
+
+    $boxLength = floatval($request->box_length) > 0 ? floatval($request->box_length) : 10;
+    $boxBreadth = floatval($request->box_breadth) > 0 ? floatval($request->box_breadth) : 10;
+    $boxHeight = floatval($request->box_height) > 0 ? floatval($request->box_height) : 10;
+    $boxWeight = floatval($request->box_weight) > 0 ? floatval($request->box_weight) : 0.5;
+
+    $payload = [
+        'order_id' => 'RNOD' . $order->id,
+        'order_date' => $order->created_at->format('Y-m-d H:i'),
+        'pickup_location' => $pickupLocation,
+        'channel_id' => '',
+        'comment' => (string) ($order->note ?? ''),
+        'billing_customer_name' => (string) ($order->name ?? 'Customer'),
+        'billing_last_name' => '',
+        'billing_address' => (string) ($order->booking_address ?? ''),
+        'billing_address_2' => '',
+        'billing_city' => (string) ($order->city ?? ''),
+        'billing_pincode' => (int) $order->zipcode,
+        'billing_state' => (string) ($order->state ?? ''),
+        'billing_country' => (string) ($order->country ?? 'India'),
+        'billing_email' => $billingEmail,
+        'billing_phone' => $billingPhone,
+        'shipping_is_billing' => true,
+        'shipping_customer_name' => (string) ($order->name ?? 'Customer'),
+        'shipping_last_name' => '',
+        'shipping_address' => (string) ($order->booking_address ?? ''),
+        'shipping_address_2' => '',
+        'shipping_city' => (string) ($order->city ?? ''),
+        'shipping_pincode' => (int) $order->zipcode,
+        'shipping_country' => (string) ($order->country ?? 'India'),
+        'shipping_state' => (string) ($order->state ?? ''),
+        'shipping_email' => $billingEmail,
+        'shipping_phone' => $billingPhone,
+        'order_items' => $items,
+        'payment_method' => $paymentMethod,
+        'shipping_charges' => (float) ($order->shipping_amount ?? 0),
+        'giftwrap_charges' => 0,
+        'transaction_charges' => 0,
+        'total_discount' => (float) ($order->discount_amount ?? 0),
+        'sub_total' => (float) $order->total_amount,
+        'length' => $boxLength,
+        'breadth' => $boxBreadth,
+        'height' => $boxHeight,
+        'weight' => $boxWeight,
+    ];
+
+    try {
+        // Step 1: Create Order Adhoc
+        $response = $client->post('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', [
+            'headers' => $headers,
+            'json' => $payload,
+        ]);
+        $orderData = json_decode($response->getBody()->getContents(), true);
+
+        if (empty($orderData['shipment_id'])) {
+            $msg = $orderData['message'] ?? 'Failed to create order on Shiprocket.';
+            if (isset($orderData['errors']) && is_array($orderData['errors'])) {
+                $msg .= ' ' . json_encode($orderData['errors']);
+            }
+            return ['status' => false, 'message' => $msg];
+        }
+
+        $shipmentId = $orderData['shipment_id'];
+        $srOrderId = $orderData['order_id'] ?? null;
+
+        // Step 2: Assign Courier / AWB
+        $awbCode = null;
+        $courierName = $request->courier_name;
+        if (!empty($request->carrier_id)) {
+            $awbRes = $client->post('https://apiv2.shiprocket.in/v1/external/courier/assign/awb', [
+                'headers' => $headers,
+                'json' => [
+                    'shipment_id' => $shipmentId,
+                    'courier_id' => (int) $request->carrier_id,
+                ],
+            ]);
+            $awbData = json_decode($awbRes->getBody()->getContents(), true);
+            if (isset($awbData['response']['data']['awb_code'])) {
+                $awbCode = $awbData['response']['data']['awb_code'];
+                $courierName = $awbData['response']['data']['courier_name'] ?? $courierName;
+            } elseif (isset($awbData['awb_assign_status']) && $awbData['awb_assign_status'] == 0) {
+                return ['status' => false, 'message' => 'AWB assignment failed: ' . ($awbData['response']['data']['awb_assign_error'] ?? json_encode($awbData))];
+            }
+        }
+
+        // Step 3: Generate Label
+        $labelUrl = null;
+        try {
+            $labelRes = $client->post('https://apiv2.shiprocket.in/v1/external/courier/generate/label', [
+                'headers' => $headers,
+                'json' => [
+                    'shipment_id' => [$shipmentId],
+                ],
+            ]);
+            $labelData = json_decode($labelRes->getBody()->getContents(), true);
+            $labelUrl = $labelData['label_url'] ?? null;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Shiprocket label generation warning: ' . $e->getMessage());
+        }
+
+        // Step 4: Request Pickup
+        try {
+            $client->post('https://apiv2.shiprocket.in/v1/external/courier/generate/pickup', [
+                'headers' => $headers,
+                'json' => [
+                    'shipment_id' => [$shipmentId],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Shiprocket pickup generation warning: ' . $e->getMessage());
+        }
+
+        return [
+            'status' => true,
+            'awb' => $awbCode,
+            'shipping_url' => $labelUrl,
+            'shipment_id' => $shipmentId,
+            'sr_order_id' => $srOrderId,
+            'courier_name' => $courierName,
+            'tracking_url' => 'https://shiprocket.co/tracking/' . $awbCode,
+        ];
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+        $body = $e->getResponse() ? $e->getResponse()->getBody()->getContents() : $e->getMessage();
+        \Illuminate\Support\Facades\Log::error('Shiprocket Create Order Error: ' . $body);
+        return ['status' => false, 'message' => 'Shiprocket Error: ' . $body];
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Shiprocket Create Order Exception: ' . $e->getMessage());
+        return ['status' => false, 'message' => $e->getMessage()];
+    }
+}
+
+function order_cancel_shiprocket($order)
+{
+    $token = shiprocketToken();
+    if (!$token) return null;
+
+    $client = new Client();
+    $headers = [
+        'Authorization' => 'Bearer ' . $token,
+        'Content-Type' => 'application/json',
+    ];
+
+    try {
+        if (!empty($order->orderTransort->order_tracking_id)) {
+            $response = $client->post('https://apiv2.shiprocket.in/v1/external/orders/cancel/shipment/awbs', [
+                'headers' => $headers,
+                'json' => [
+                    'awbs' => [(string) $order->orderTransort->order_tracking_id]
+                ]
+            ]);
+            return json_decode($response->getBody()->getContents(), true);
+        } else {
+            $response = $client->post('https://apiv2.shiprocket.in/v1/external/orders/cancel', [
+                'headers' => $headers,
+                'json' => [
+                    'ids' => ['RNOD' . $order->id]
+                ]
+            ]);
+            return json_decode($response->getBody()->getContents(), true);
+        }
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Shiprocket Cancel Error: ' . $e->getMessage());
+        return null;
+    }
+}
+
+function generate_manifest_shiprocket($shipmentId)
+{
+    $token = shiprocketToken();
+    if (!$token) return ['status' => false, 'message' => 'Auth failed'];
+
+    $client = new Client();
+    try {
+        $response = $client->post('https://apiv2.shiprocket.in/v1/external/manifests/generate', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'shipment_id' => is_array($shipmentId) ? $shipmentId : [$shipmentId]
+            ]
+        ]);
+        return json_decode($response->getBody()->getContents(), true);
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Shiprocket Manifest Error: ' . $e->getMessage());
+        return ['status' => false, 'message' => $e->getMessage()];
+    }
+}
+
+function order_cancel_shipping($order)
+{
+    if (!empty($order->orderTransort)) {
+        if (str_contains(strtolower($order->orderTransort->transport_name ?? ''), 'shiprocket') ||
+            str_contains(strtolower($order->orderTransort->transport_url ?? ''), 'shiprocket')) {
+            return order_cancel_shiprocket($order);
+        }
+    }
+    return order_cancel_shipway($order);
+}
+
 ?>

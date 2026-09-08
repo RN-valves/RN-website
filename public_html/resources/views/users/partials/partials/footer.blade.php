@@ -201,21 +201,7 @@ jQuery(function(){
     }
     
 </style>
-<!----asr--->
-<script src="{{url('users/asr_zoom/jquery.jqzoom.js')}}" type="text/javascript"></script>
-
-<script type="text/javascript">
-$(document).ready(function() {
-  $('.jqzoom').jqzoom({
-         zoomType: 'innerzoom',
-            preloadImages: false,
-            alwaysOn:false,
-            title: false,
-             showEffect: 'show'
-        });  
-});
-</script>
-<!----asr---> 
+ 
 
 <!-- sticky script -->  
 <script>

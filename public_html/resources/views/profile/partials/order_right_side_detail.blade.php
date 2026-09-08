@@ -9,7 +9,7 @@
             @if(!empty($order->orderTransort->order_tracking_id))
             <div class="cusname">
                <p class="text-muted">Tracking Id</p>
-               {{ @$order->orderTransort->order_tracking_id??'' }} | <a target="_blank" href="{{ url('https://rnvalves.shipway.com/track') }}" class="text-info">Click to Track</a>
+               {{ @$order->orderTransort->order_tracking_id??'' }} | <a target="_blank" href="{{ !empty($order->orderTransort->transport_url) ? $order->orderTransort->transport_url : (str_contains(strtolower(@$order->orderTransort->transport_name ?? ''), 'shiprocket') ? 'https://shiprocket.co/tracking/' . @$order->orderTransort->order_tracking_id : 'https://rnvalves.shipway.com/track') }}" class="text-info">Click to Track</a>
             </div>
             @endif
          </div>

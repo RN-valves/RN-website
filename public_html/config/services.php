@@ -40,4 +40,20 @@ return [
         'secret' => env('RAZORPAY_SECRET'),
     ],
 
+    'shiprocket' => [
+        'email' => env('SHIPROCKET_EMAIL', 'digital@rnvalves.com'),
+        'password' => env('SHIPROCKET_PASSWORD', 'E@Y6gjHRin7dD#n&qZdyd!PD8&pRETfO'),
+        'pickup_location' => env('SHIPROCKET_PICKUP_LOCATION', 'Home'),
+        'pickup_pincode' => env('SHIPROCKET_PICKUP_PINCODE', 201010),
+        'base_url' => env('SHIPROCKET_BASE_URL', 'https://apiv2.shiprocket.in/v1/external/'),
+    ],
+
+    'shipway' => [
+        'username' => env('SHIPWAY_USERNAME', 'rncom@rnvalves.com'),
+        'password' => env('SHIPWAY_PASSWORD', '9D57l172eMP15a67WB7O1h51j4dv1XD7'),
+        'warehouse_id' => env('SHIPWAY_WAREHOUSE_ID', '60832'),
+        'pickup_pincode' => env('SHIPWAY_PICKUP_PINCODE', 201010),
+        'track_url' => env('SHIPWAY_TRACK_URL', 'https://rnvalves.shipway.com/track'),
+    ],
+
 ];

@@ -344,23 +344,32 @@ class OrderController extends Controller
 
     public function getCarrierRate(Request $request)
     {
-
        $order = Order::find($request->order_id);
        if (!$order) {
            return response()->json(['error' => 'Order not found'], 404);
        }
+
+       $provider = $request->input('shipping_provider', 'shipway');
+
+       if ($provider === 'shiprocket') {
+           $result = get_shiprocket_rates($order, $request);
+           if (!$result['success']) {
+               return response()->json(['error' => $result['error'] ?? 'Failed to fetch Shiprocket carrier rates'], 404);
+           }
+           return response()->json($result);
+       }
        
        $paymentMode = ($order->payment_term == 'Prepaid') ? "prepaid" : "cod";
-        if ($paymentMode === 'cod') {
-           $codAmount = (int) $order->total_amount;
-        }else{
-           $codAmount = 0;
-        }
+       if ($paymentMode === 'cod') {
+          $codAmount = (int) $order->total_amount;
+       }else{
+          $codAmount = 0;
+       }
        $token = shipwayKey();
        
        $client = new Client();
        $queryParams = http_build_query([
-           "fromPincode"      => 201010,
+           "fromPincode"      => config('services.shipway.pickup_pincode', 201010),
            "toPincode"        => (int) $order->zipcode,
            "paymentType"      => $paymentMode,
            "length"          => (int) $request->length,
@@ -381,14 +390,14 @@ class OrderController extends Controller
            $response = $client->sendAsync($request1)->wait();
            $data = json_decode($response->getBody()->getContents(), true);
            if (!isset($data['rate_card']) || empty($data['rate_card'])) {
-               return response()->json(['error' => 'No carrier rates found'], 404);
+               return response()->json(['error' => 'No carrier rates found on Shipway'], 404);
            }
-           $options = "<option value=''>Select Courier</option>";
+           $options = "<option value=''>Select Courier (Shipway)</option>";
            foreach ($data['rate_card'] as $rate) {
                 $gstCharge = $rate['delivery_charge']*18/100;
-                $totalDeliveryCharge = $gstCharge+$rate['delivery_charge'];
+                $totalDeliveryCharge = round($gstCharge+$rate['delivery_charge'], 2);
                 $codCharge = isset($rate['cod_charges']) ? $rate['cod_charges'] : 0;
-                $options .= "<option value='{$rate['carrier_id']}' data-courier-name='{$rate['courier_name']}' data-delivery-charge='{$rate['delivery_charge']}' data-cod-charge='{$codCharge}' >";
+                $options .= "<option value='{$rate['carrier_id']}' data-courier-name='{$rate['courier_name']}' data-delivery-charge='{$rate['delivery_charge']}' data-cod-charge='{$codCharge}' data-provider='shipway'>";
                 $options .= "{$rate['courier_name']} - ₹ {$totalDeliveryCharge}";
                if ($paymentMode === 'cod') {
                    $options .= " (COD Charge: ₹ {$codCharge})";
@@ -401,52 +410,100 @@ class OrderController extends Controller
                'html' => $options,
                'message' => 'Data fetched successfully'
            ]);
-       } catch (RequestException $e) {
+       } catch (\Exception $e) {
            return response()->json([
                'success' => false,
-               'error'   => 'Failed to fetch carrier rates',
+               'error'   => 'Failed to fetch carrier rates: ' . $e->getMessage(),
                'message' => $e->getMessage()
-           ], $e->getCode() ?: 500);
+           ], 500);
        }
         
     }
 
     public function AssignCarrier(Request $request){
-        // try{
-            $request->validate([
-                'box_length' => ['required'],
-                'box_breadth' => ['required'],
-                'box_height' => ['required'],
-                'carrier_id' => ['required','numeric'],
-                'order_id' => ['required','numeric'],
-                'courier_name' => ['required'],
-                'delivery_charge' => ['required'],
-                'cod_charge' => ['required'],
-            ]);
-            $gstcharge = ($request->cod_charge+$request->delivery_charge)*18/100;
-            $order = Order::find($request->order_id);
+        $request->validate([
+            'box_length' => ['required'],
+            'box_breadth' => ['required'],
+            'box_height' => ['required'],
+            'carrier_id' => ['required'],
+            'order_id' => ['required','numeric'],
+            'courier_name' => ['required'],
+            'delivery_charge' => ['required'],
+            'cod_charge' => ['required'],
+            'shipping_provider' => ['nullable', 'string', 'in:shipway,shiprocket'],
+        ]);
 
-            if ($order->isStorePickup()) {
-                return back()->with('error', 'Store Pickup orders cannot be processed through Shipway.');
-            }
+        $gstcharge = round(($request->cod_charge + $request->delivery_charge) * 18 / 100, 2);
+        $order = Order::find($request->order_id);
 
-            if ($order->isManualDelivery()) {
-                return back()->with('error', 'This order was completed without Shipway.');
-            }
-            
-            $reponse = order_push_shipway($order,$request);
-            //Log::info("Data fetching order RNOD{$order->id}: " . $reponse);
-            if(isset($reponse) && $reponse['awb_response']['success'] == true){
+        if (!$order) {
+            return back()->with('error', 'Order not found.');
+        }
+
+        if ($order->isStorePickup()) {
+            return back()->with('error', 'Store Pickup orders cannot be processed through couriers.');
+        }
+
+        if ($order->isManualDelivery()) {
+            return back()->with('error', 'This order was completed without automated courier shipping.');
+        }
+
+        $provider = $request->input('shipping_provider', 'shipway');
+
+        if ($provider === 'shiprocket') {
+            $response = order_push_shiprocket($order, $request);
+            if (isset($response['status']) && $response['status'] == true) {
+                $trackingUrl = !empty($response['awb']) ? 'https://shiprocket.co/tracking/' . $response['awb'] : 'https://shiprocket.co/tracking';
                 OrderTransport::updateOrCreate(
                     ['order_id' => $order->id],
                     [
                         'user_id'           => $order->user_id,
-                        'carrier_id'           => $request->carrier_id,
-                        'transport_name'    => preg_replace('/\s*\(.*?\)/', '', $request->courier_name),
+                        'carrier_id'        => $request->carrier_id,
+                        'transport_name'    => 'Shiprocket - ' . preg_replace('/\s*\(.*?\)/', '', $response['courier_name'] ?? $request->courier_name),
+                        'transport_contact' => '',
+                        'transport_url'     => $trackingUrl,
+                        'order_tracking_id' => $response['awb'] ?? '',
+                        'attachment'        => $response['shipping_url'] ?? ''
+                    ]
+                );
+                $order->package_length = $request->box_length;
+                $order->package_breadth = $request->box_breadth;
+                $order->package_height = $request->box_height;
+                $order->package_weight = $request->box_weight;
+                $order->delivery_charge = $request->delivery_charge;
+                $order->cod_charge = $request->cod_charge;
+                $order->gst_charge = $gstcharge;
+                $order->total_delivery_charge = $gstcharge + $request->delivery_charge + $request->cod_charge;
+                if (!empty($response['shipment_id'])) {
+                    $order->manifest_ids = $response['shipment_id'];
+                }
+                $order->save();
+
+                OrderLog::create([
+                    'order_id'     => $order->id,
+                    'user_id'      => auth()->user()->id ?? 0,
+                    'user_name'    => auth()->user()->name ?? 'Admin',
+                    'change_value' => 'Shipping label generated via Shiprocket (' . ($response['courier_name'] ?? $request->courier_name) . ' - AWB: ' . ($response['awb'] ?? 'N/A') . ')',
+                    'change_type'  => 'shipping',
+                ]);
+
+                return back()->with('success', 'Shiprocket order & shipping label generated successfully! AWB: ' . ($response['awb'] ?? ''));
+            } else {
+                return back()->with('error', $response['message'] ?? 'Failed to generate Shiprocket label.')->withInput();
+            }
+        } else {
+            $reponse = order_push_shipway($order,$request);
+            if(isset($reponse) && isset($reponse['awb_response']) && $reponse['awb_response']['success'] == true){
+                OrderTransport::updateOrCreate(
+                    ['order_id' => $order->id],
+                    [
+                        'user_id'           => $order->user_id,
+                        'carrier_id'        => $request->carrier_id,
+                        'transport_name'    => 'Shipway - ' . preg_replace('/\s*\(.*?\)/', '', $request->courier_name),
                         'transport_contact' => '',
                         'transport_url'     => 'https://rnvalves.shipway.com/track',
                         'order_tracking_id' => $reponse['awb_response']['AWB'],
-                        'attachment' => $reponse['awb_response']['shipping_url']
+                        'attachment'        => $reponse['awb_response']['shipping_url']
                     ]
                 );
                 $order->package_length = $request->box_length;
@@ -458,26 +515,48 @@ class OrderController extends Controller
                 $order->gst_charge = $gstcharge;
                 $order->total_delivery_charge = $gstcharge+$request->delivery_charge+$request->cod_charge;
                 $order->save();
+
+                OrderLog::create([
+                    'order_id'     => $order->id,
+                    'user_id'      => auth()->user()->id ?? 0,
+                    'user_name'    => auth()->user()->name ?? 'Admin',
+                    'change_value' => 'Shipping label generated via Shipway (' . $request->courier_name . ' - AWB: ' . $reponse['awb_response']['AWB'] . ')',
+                    'change_type'  => 'shipping',
+                ]);
+
+                return back()->with('success', 'Shipway order label generated successfully!');
             }else{
-                return back()->with('error', 'Something went wrong!')->withInput();
+                return back()->with('error', 'Failed to generate Shipway label.')->withInput();
             }
-            return back()->with('success', 'Order label generate successfully!');
-        // }catch(\Exception $e){
-        //     return back()->with('error', $e->getMessage());
-        // }
-     
+        }
     }
+
     public function GenerateManifest(Request $request)
     {
         try{
-            $orderids = (string) "RNOD".$request->order_ids;
-            $response = generate_manifest_shipway($orderids);
             $order = Order::find($request->order_ids);
-            if(isset($response['status']) && $response['status'] == true){
-                $order->manifest_ids = $response['manifest_ids'];
-                $order->save();
+            if (!$order) {
+                return back()->with('error', 'Order not found.');
             }
-            return back()->with('success', 'Order manifest generate successfully!');
+
+            if (!empty($order->orderTransort) && (str_contains(strtolower($order->orderTransort->transport_name ?? ''), 'shiprocket') || str_contains(strtolower($order->orderTransort->transport_url ?? ''), 'shiprocket'))) {
+                $shipmentId = $order->manifest_ids ?: $order->id;
+                $response = generate_manifest_shiprocket($shipmentId);
+                if (isset($response['manifest_url'])) {
+                    $order->manifest_ids = $response['manifest_url'];
+                    $order->save();
+                    return back()->with('success', 'Shiprocket manifest generated successfully!');
+                }
+                return back()->with('success', 'Shiprocket manifest requested.');
+            } else {
+                $orderids = (string) "RNOD".$request->order_ids;
+                $response = generate_manifest_shipway($orderids);
+                if(isset($response['status']) && $response['status'] == true){
+                    $order->manifest_ids = $response['manifest_ids'];
+                    $order->save();
+                }
+                return back()->with('success', 'Order manifest generated successfully!');
+            }
 
         }catch(\Exception $e){
             return back()->with('error', $e->getMessage());

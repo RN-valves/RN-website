@@ -179,25 +179,7 @@ $(document).ready(function () {
 </script>
 {{-- New website scripts end --}}
 
-@if($isProductDetail)
-<!----asr--->
-<script src="{{url('users/asr_zoom/jquery.jqzoom.js')}}" type="text/javascript" defer></script>
 
-<script type="text/javascript">
-document.addEventListener('DOMContentLoaded', function() {
-  if (typeof jQuery !== 'undefined' && jQuery('.jqzoom').length) {
-    jQuery('.jqzoom').jqzoom({
-         zoomType: 'innerzoom',
-            preloadImages: false,
-            alwaysOn:false,
-            title: false,
-             showEffect: 'show'
-        });
-  }
-});
-</script>
-<!----asr--->
-@endif
 
 <!-- sticky script -->
 <script>
