@@ -597,6 +597,38 @@ function get_shiprocket_rates($order, $request)
     }
 }
 
+function get_shiprocket_pickup_location($token)
+{
+    $location = config('services.shiprocket.pickup_location', env('SHIPROCKET_PICKUP_LOCATION'));
+    if (!empty($location) && $location !== 'Home') {
+        return $location;
+    }
+
+    return \Illuminate\Support\Facades\Cache::remember('shiprocket_primary_pickup_location', 60 * 60 * 24, function () use ($token) {
+        try {
+            $client = new Client();
+            $res = $client->get('https://apiv2.shiprocket.in/v1/external/settings/company/pickup', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $token,
+                    'Content-Type'  => 'application/json',
+                ],
+            ]);
+            $data = json_decode($res->getBody()->getContents(), true);
+            if (!empty($data['data']['shipping_address'])) {
+                foreach ($data['data']['shipping_address'] as $addr) {
+                    if (!empty($addr['is_primary_location'])) {
+                        return $addr['pickup_location'];
+                    }
+                }
+                return $data['data']['shipping_address'][0]['pickup_location'] ?? 'Office';
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Shiprocket fetch pickup location error: ' . $e->getMessage());
+        }
+        return 'Office';
+    });
+}
+
 function order_push_shiprocket($order, $request)
 {
     $token = shiprocketToken();
@@ -629,7 +661,7 @@ function order_push_shiprocket($order, $request)
     }
 
     $paymentMethod = ($order->payment_term == 'Prepaid') ? 'Prepaid' : 'COD';
-    $pickupLocation = config('services.shiprocket.pickup_location', 'Home');
+    $pickupLocation = get_shiprocket_pickup_location($token);
 
     $billingEmail = (!empty($order->email) && filter_var($order->email, FILTER_VALIDATE_EMAIL)) ? $order->email : (config('services.shiprocket.email') ?: 'billing@rnvalves.com');
     $billingPhone = preg_replace('/[^0-9]/', '', (string)$order->mobile);
@@ -689,6 +721,20 @@ function order_push_shiprocket($order, $request)
             'json' => $payload,
         ]);
         $orderData = json_decode($response->getBody()->getContents(), true);
+
+        // Auto-retry if pickup location mismatch
+        if (empty($orderData['shipment_id']) && isset($orderData['message']) && str_contains(strtolower($orderData['message']), 'pickup location')) {
+            \Illuminate\Support\Facades\Cache::forget('shiprocket_primary_pickup_location');
+            $retryPickupLocation = get_shiprocket_pickup_location($token);
+            if ($retryPickupLocation !== $pickupLocation) {
+                $payload['pickup_location'] = $retryPickupLocation;
+                $retryRes = $client->post('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', [
+                    'headers' => $headers,
+                    'json' => $payload,
+                ]);
+                $orderData = json_decode($retryRes->getBody()->getContents(), true);
+            }
+        }
 
         if (empty($orderData['shipment_id'])) {
             $msg = $orderData['message'] ?? 'Failed to create order on Shiprocket.';
