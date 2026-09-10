@@ -43,7 +43,7 @@ return [
     'shiprocket' => [
         'email' => env('SHIPROCKET_EMAIL'),
         'password' => env('SHIPROCKET_PASSWORD'),
-        'pickup_location' => env('SHIPROCKET_PICKUP_LOCATION', 'Home'),
+        'pickup_location' => env('SHIPROCKET_PICKUP_LOCATION', 'Office'),
         'pickup_pincode' => env('SHIPROCKET_PICKUP_PINCODE', 201010),
         'base_url' => env('SHIPROCKET_BASE_URL', 'https://apiv2.shiprocket.in/v1/external/'),
     ],
