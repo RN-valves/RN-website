@@ -64,6 +64,9 @@ class Product extends Model
     }
 
     public function productImages(){
+        if (!empty($this->sku_code)) {
+            return $this->hasMany(ProductImage::class, 'sku_code', 'sku_code');
+        }
         return $this->hasMany(ProductImage::class, 'product_id');
     }
 

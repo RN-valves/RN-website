@@ -13,7 +13,7 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <link rel="canonical" href="{{ url()->current() }}">
+  <link rel="canonical" href="{{ preg_replace('/^http:/i', 'https:', url()->current()) }}">
 
   @yield('seo_title')
 

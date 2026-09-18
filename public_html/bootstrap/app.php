@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
+
         // Allow the PTMT landing page (cross-origin) to POST to /store-popup-form-response
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
 

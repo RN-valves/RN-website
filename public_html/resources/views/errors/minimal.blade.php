@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <meta http-equiv="Content-Style-Type" content="text/css" />
-    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="canonical" href="{{ preg_replace('/^http:/i', 'https:', url()->current()) }}">
     <title>No site for domain</title>
     <style>
       body {

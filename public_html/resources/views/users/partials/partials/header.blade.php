@@ -5,9 +5,9 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
       <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <link rel="canonical" href="{{url()->full()}}" />
-      <meta property="og:url" content="{{url()->full()}}">
-      <meta property=twitter:url content="{{url()->full()}}">
+      <link rel="canonical" href="{{ preg_replace('/^http:/i', 'https:', url()->full()) }}" />
+      <meta property="og:url" content="{{ preg_replace('/^http:/i', 'https:', url()->full()) }}">
+      <meta property=twitter:url content="{{ preg_replace('/^http:/i', 'https:', url()->full()) }}">
       <meta property=og:site_name content="RN Valves & Faucets">
       <meta property=twitter:card content=summary>
       <meta property=twitter:site content="RN Valves & Faucets">

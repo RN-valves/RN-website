@@ -30,3 +30,6 @@ storage/framework/views/*
 
 __MACOSX/
 .DS_Store
+_debug_gallery.php
+public/uploads/imports/*
+RNwebbackup.sqlEnter

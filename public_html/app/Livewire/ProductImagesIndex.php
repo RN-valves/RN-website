@@ -69,7 +69,8 @@ final class ProductImagesIndex extends PowerGridComponent
                     'product_images.id',
                     'products.article',
                     'product_images.sku_code',
-                    'product_images.image'
+                    'product_images.image',
+                    'products.image as main_image'
                 )
                 ->orderBy('product_images.id');
 
@@ -103,11 +104,15 @@ final class ProductImagesIndex extends PowerGridComponent
             }
 
             foreach ($query->cursor() as $row) {
+                $isMain = normalizeProductImageUrl($row->image) !== ''
+                    && normalizeProductImageUrl($row->image) === normalizeProductImageUrl($row->main_image);
+
                 yield [
                     'id' => $row->id,
                     'article' => $row->article,
                     'sku_code' => $row->sku_code,
                     'image' => $row->image,
+                    'is_main' => $isMain ? 1 : 0,
                 ];
             }
         };

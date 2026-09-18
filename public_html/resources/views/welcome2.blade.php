@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="canonical" href="{{ url()->current() }}">
+  <link rel="canonical" href="{{ preg_replace('/^http:/i', 'https:', url()->current()) }}">
   <title>RN Valves & Faucets</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -132,13 +132,18 @@ class ProductImagesController extends Controller
         try{
             if($request->isMethod('post')){
                 $request->validate([
-                    'import_file' => ['required','mimes:xlsx'],
+                    'import_file' => ['required','file','mimes:xlsx,xls,csv'],
                 ]);
 
                 if($request->hasFile('import_file')){
                     try{
                         $import = new ProductImagesImport;
                         $import->import($request->file('import_file'));
+
+                        try {
+                            \Artisan::call('view:clear');
+                            \Artisan::call('cache:clear');
+                        } catch (\Exception $e) {}
                     }catch(\Maatwebsite\Excel\Validators\ValidationException $e){
                         $failures = $e->failures();
                         return back()->with('failures', $failures);
@@ -169,16 +174,21 @@ class ProductImagesController extends Controller
                             'product_images.id',
                             'products.article',
                             'product_images.sku_code',
-                            'product_images.image'
+                            'product_images.image',
+                            'products.image as main_image'
                         )
                         ->orderBy('product_images.id');
 
                     foreach ($query->cursor() as $row) {
+                        $isMain = normalizeProductImageUrl($row->image) !== ''
+                            && normalizeProductImageUrl($row->image) === normalizeProductImageUrl($row->main_image);
+
                         yield [
                             'id' => $row->id,
                             'article' => $row->article,
                             'sku_code' => $row->sku_code,
                             'image' => $row->image,
+                            'is_main' => $isMain ? 1 : 0,
                         ];
                     }
                 };

@@ -30,7 +30,8 @@
                <h5 class="card-title text-primary">File Uplaod</h5>
                <ul style="list-style-type:none;">
                   <li>1. Download Latest template</li>
-                  <li class="small text-muted">Update Template includes <strong>id</strong> — keep that column so image URL changes replace the existing row.</li>
+                  <li class="small text-muted">Update Template includes <strong>id</strong> — keep it so changes replace the existing row.</li>
+                  <li class="small text-muted">Set <strong>is_main = 1</strong> on a row to also update the website main/hero image (`products.image`).</li>
                   <li></li>
                </ul>
                <a href="{{ route('productImages.import_productImages', ['export'=>'export']) }}" class="btn btn-sm btn-info border"> <i class="bx bx-cloud-download"></i> Add New Template</a>
